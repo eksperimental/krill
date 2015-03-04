@@ -1,0 +1,14 @@
+1 Running ["FaviconCheck", "HtmlCheck", "ScriptCheck", "ImageCheck", "LinkCheck"] checks on ./_site on *.html... 
+
+
+2 Checking 179 external links...
+3 Ran on 99 files!
+
+
+4 htmlproof 2.1.0 | Error:  HTML-Proofer found 39 failures!
+
+5 - ./_site/getting-started/enumerables-and-streams.html
+  *  linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist (line 214)
+6 - ./_site/getting-started/mix-otp/task-and-gen-tcp.html
+  *  linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist (line 227)
+-7 - ./_site/getting_started/1.html
