@@ -1,40 +1,31 @@
 defmodule Htmlproof do
-  #import Krill
-  #use Application
-  #@behaviour Krill
-  use Krill
+  @state {:global, __MODULE__}
+  use Krill, dict: @state
 
   @command_name "htmlproof"
-  #@state {:global, __MODULE__}
-  
+
   @moduledoc """
   """
-
-  # #def start(_, _) do
-  # def start do
-  #   new
-  #   state(:command, "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
-  #   run
-  # end
 
   @doc """
   Creates a new feeder
   """
   def new do
-    state(:command, "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
+    #state(@state, :command, "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
+    state(@state, :command, "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
 
     # default messages
-    state(:message_ok, "OK: #{@command_name} - Documents have been validated.")
-    state(:message_ok, "ERROR: #{@command_name} - Documents did not validate.")
+    state(@state, :message_ok, "OK: #{@command_name} - Documents have been validated.")
+    state(@state, :message_ok, "ERROR: #{@command_name} - Documents did not validate.")
 
-    state(:reject, stdout: [
+    state(@state, :reject, stdout: [
       ~r/Running \[.*\] checks on/,
       ~r/Checking \d+ external links\.\.\./,
       ~r/Ran on \d+ files!/,
       ~r/htmlproof [0-9.]+ \|/,
     ])
 
-    state(:reject, stderr: [
+    state(@state, :reject, stderr: [
       # Local errors, when /docs/ exists
       "linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist",
 
@@ -46,25 +37,19 @@ defmodule Htmlproof do
     :ok
   end
 
-  # def run(command, input \\ nil) do
-  #   exec(command, input)
-  #   capture
-  #   process_std
-  # end
-
-  defp process_std do
+  def process_std do
     #stdout
-    stdout = read!(:stdout_raw) |> 
-      accept(:stdout) |>
-      reject(:stdout)
-    state(:stdout, stdout)
+    stdout = read!(@state, :stdout_raw) |> 
+      accept(@state, :stdout) |>
+      reject(@state, :stdout)
+    state(@state, :stdout, stdout)
 
     #stderr
-    stderr = read!(:stderr_raw) |> 
-      reject(:stderr) |>
+    stderr = read!(@state, :stderr_raw) |> 
+      reject(@state, :stderr) |>
       discard_favicons_on_redirects |>
       discard_files_no_errors
-    state(:stderr_raw, stderr)
+    state(@state, :stderr_raw, stderr)
 
     :ok
   end
@@ -97,9 +82,11 @@ defmodule Htmlproof do
 
   # Improve OK/ERRROR messages  
   defp capture do
-    stdout_raw = read!(:stdout_raw) 
-    stderr_raw = read!(:stderr_raw) 
+    stdout_raw = read!(@state, :stdout_raw) 
+    stderr_raw = read!(@state, :stderr_raw) 
 
+    IO.puts "STDOUT_RAW" <> stdout_raw
+    #exit :kill
     # Grab total number of documents and errors
     [_, total_files] = Regex.run(~r/Ran on (\d+) files!/, stdout_raw)
     [_, total_external_links] = Regex.run(~r/Checking (\d+) external links/, stdout_raw)
@@ -107,12 +94,12 @@ defmodule Htmlproof do
     error_files = accept(stderr_raw, [~r/^-\s+/]) |> count_lines
     
     if is_integer(total_files) do
-      msg_ok = "OK: #{state(:command_name)} - #{total_files} documents have been validated."
-      state(:message_ok, msg_ok)
+      msg_ok = "OK: #{state(@state, :command_name)} - #{total_files} documents have been validated."
+      state(@state, :message_ok, msg_ok)
     end
 
     if is_integer(total_errors) do
-      msg_error = "ERROR: #{state(:command_name)} - #{total_errors} errors found in #{error_files} documents."
+      msg_error = "ERROR: #{state(@state, :command_name)} - #{total_errors} errors found in #{error_files} documents."
       # Show number of documents and links if available
       if is_integer(total_errors) do
         msg_error = msg_error <> " Total Documents: #{total_files}."
@@ -120,7 +107,7 @@ defmodule Htmlproof do
       if is_integer(total_external_links) do
         msg_error = msg_error <> " Total Links: #{total_external_links}."
       end
-      state(:message_error, msg_error)
+      state(@state, :message_error, msg_error)
     end
 
     :ok

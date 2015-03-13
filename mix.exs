@@ -5,7 +5,8 @@ defmodule Krill.Mixfile do
     [app: :krill,
      version: "0.0.1",
      #elixir: "~> 1.1-dev",
-     elixir: ">= 1.1.0-dev and < 2.0.0",
+     #elixir: ">= 1.1.0-dev and < 2.0.0",
+     elixir: "~> 1.0.2 or ~> 1.1-dev",
      deps: deps,
     ]
   end
@@ -16,7 +17,8 @@ defmodule Krill.Mixfile do
   def application do
     [
       applications: [:logger, :porcelain, ],
-      mod: {PorcelainExample, []},
+      #mod: {Krill, []},
+      mod: {Htmlproof, []},
     ]
   end
 

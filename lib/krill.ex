@@ -11,60 +11,67 @@ defmodule Krill do
   alias Porcelain.Process
   alias Porcelain.Result
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
+    dict = Keyword.get(opts, :dict)
+
     quote do
       import Krill
-      use Application
+      #use Application
       @behaviour Krill
-      @state {:global, unquote(__MODULE__)}
-      defoverridable [capture: 0]
-      #defoverridable [start:0, start: 2, run: 2, new: 0, capture: 0]
 
-      def start(_, _) do
-        start_link(@state)
-        counter(1)
-        start
-        messages_default
+      def start(dict) do
+        :ok = new
+        run(dict, state(dict, :command))
       end
 
-      def start do
-        :ok = new
-        run(state(:command))
+      def start(_, _) do
+        start_link(unquote(dict))
+        counter(unquote(dict), 1)
+        start(unquote(dict))
+        messages_default(unquote(dict))
       end
 
       def new, do: :ok
+      #def capture, do: nil
 
-      def run(command, input \\ nil) do
-        exec(command, input)
-        capture
-        process_std
+      def run(dict, command, input \\ nil) do
+        exec(dict, command, input)
+        IO.puts "command: " <> state(@state, :command)
+        IO.puts "stdout: " <> state(@state, :stdout_raw)
+        #exit :kill
+
+        # capture
+        # process_std
       end
-    end      
+
+      #defoverridable [start: 1, start: 2, new: 0, run: 2, capture: 0, ]
+      defoverridable [start: 1, start: 2, new: 0, run: 2, ]
+    end
   end
 
-
   def capture, do: nil
-  #def new, do: nil
+  def process_std, do: :ok
 
+  # def start(_, _), do: :ok
 
   # AGENT
   def start_link(dict),
   do: Agent.start_link(fn -> HashDict.new end, name: dict)
 
-  def state(id),
-  do: Agent.get(@state, &Dict.get(&1, id))
+  def state(dict, id),
+  do: Agent.get(dict, &Dict.get(&1, id))
 
-  def state(id, message),
-  do: Agent.update(@state, &Dict.put(&1, id, message))
+  def state(dict, id, message),
+  do: Agent.update(dict, &Dict.put(&1, id, message))
 
   # COUNTER
   # get
-  defp counter, do: state(:counter)
+  def counter(dict), do: state(dict, :counter)
   # update
-  defp counter(n), do: state(:counter, n)
-  def counter_increase do
-    result = counter + 1
-    :ok = state(:counter, result)
+  def counter(dict, n), do: state(dict, :counter, n)
+  def counter_increase(dict) do
+    result = counter(dict) + 1
+    :ok = state(dict, :counter, result)
     result
   end
 
@@ -73,15 +80,15 @@ defmodule Krill do
     ((mega * 1000000 + sec) * 1000000)+micro
   end
 
-  defp messages_default do
-    state(:message_ok, "OK: Everything is alright.")
-    state(:message_error, "ERROR: Errors have been found.")
+  def messages_default(dict) do
+    state(dict, :message_ok, "OK: Everything is alright.")
+    state(dict, :message_error, "ERROR: Errors have been found.")
   end
 
-  def read!(source) do
+  def read!(dict, source) do
     case source do
       std when std in [:stdin, :stdout, :stderr, :stdin_raw, :stdout_raw, :stderr_raw, ] ->
-        state(std)
+        state(dict, std)
       
       path when is_bitstring(path) ->
         File.read!(path)
@@ -112,8 +119,8 @@ defmodule Krill do
       Enum.count(text, fn(line) -> lines =~ pattern end)
   end
 
-  def accept(text, type) when is_atom(type),
-  do: accept(text, state(type, :accept))
+  def accept(dict, text, type) when is_atom(type),
+  do: accept(text, state(dict, type, :accept))
 
   def accept(text, rules) when is_bitstring(text) and is_list(rules) do
     String.split(text, "\n")
@@ -125,8 +132,8 @@ defmodule Krill do
       |> Enum.join("\n")
   end
 
-  def reject(text, type) when is_atom(type),
-  do: reject(text, state(type, :reject))
+  def reject(dict, text, type) when is_atom(type),
+  do: reject(text, state(dict, type, :reject))
 
   def reject(text, rules) when is_bitstring(text) and is_list(rules) do
     String.split(text, "\n")
@@ -139,31 +146,33 @@ defmodule Krill do
   end
 
   # PORCELAIN
-  def exec(command, input \\ nil) do
+  def exec(dict, command, input \\ nil) do
     opts = [
       out: {:send, self()},
       err: {:send, self()}
     ]
     
-    unless is_nil? input,
+    unless is_nil(input),
     do: opts = [input: input] ++ opts
 
     %Process{pid: pid} = Porcelain.spawn_shell(command, opts)
-    handle_output(pid)
+    handle_output(dict, pid)
   end
 
-  def handle_output(pid) do
+  def handle_output(dict, pid) do
     receive do
       {^pid, :data, :out, data} ->
-        state(:stdout_raw, data)
-        handle_output(pid)
+        state(dict, :stdout_raw, data)
+        handle_output(dict, pid)
       {^pid, :data, :err, data} ->
-        state(:stderr_raw, data)
-        handle_output(pid)
+        state(dict, :stderr_raw, data)
+        handle_output(dict, pid)
       {^pid, :result, %Result{status: status}} ->
         IO.puts "status:\n#{status}"
-    after
-      5_000 -> IO.puts "timeout"
+        capture
+        process_std
+    #after
+    #  5_000 -> IO.puts "timeout"
     end
   end
 
