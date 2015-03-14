@@ -16,20 +16,24 @@ defmodule Krill do
 
     quote do
       import Krill
-      #use Application
+      # use Application
       @behaviour Krill
+
+      # def start(_type, _args) do
+      #   {:ok, _pid} = Krill.Supervisor.start_link(unquote(__MODULE__), unquote(dict))
+      # end
 
       def start(dict) do
         :ok = new
         run(dict, state(dict, :command))
       end
 
-      def start(_, _) do
-        start_link(unquote(dict))
-        counter(unquote(dict), 1)
-        start(unquote(dict))
-        messages_default(unquote(dict))
-      end
+      # def start(_, _) do
+      #   start_link(unquote(dict))
+      #   counter(unquote(dict), 1)
+      #   start(unquote(dict))
+      #   messages_default(unquote(dict))
+      # end
 
       def new, do: :ok
       #def capture, do: nil

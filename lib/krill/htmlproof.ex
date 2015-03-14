@@ -1,4 +1,4 @@
-defmodule Htmlproof do
+defmodule Krill.Htmlproof do
   @state {:global, __MODULE__}
   use Krill, dict: @state
 

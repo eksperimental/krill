@@ -18,7 +18,7 @@ defmodule Krill.Mixfile do
     [
       applications: [:logger, :porcelain, ],
       #mod: {Krill, []},
-      mod: {Htmlproof, []},
+      mod: {Loader, []},
     ]
   end
 
