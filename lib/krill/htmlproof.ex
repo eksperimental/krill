@@ -1,6 +1,6 @@
 defmodule Krill.Htmlproof do
-  @state {:global, __MODULE__}
-  use Krill, dict: @state
+  @name {:global, __MODULE__}
+  use Krill, name: @name
 
   @command_name "htmlproof"
 
@@ -10,22 +10,22 @@ defmodule Krill.Htmlproof do
   @doc """
   Creates a new feeder
   """
-  def new do
-    #state(@state, :command, "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
-    state(@state, :command, "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
+  def new(pid) do
+    #Server.put(pid, :command, "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
+    Server.put(pid, :command, "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
 
     # default messages
-    state(@state, :message_ok, "OK: #{@command_name} - Documents have been validated.")
-    state(@state, :message_ok, "ERROR: #{@command_name} - Documents did not validate.")
+    Server.put(pid, :message_ok, "OK: #{@command_name} - Documents have been validated.")
+    Server.put(pid, :message_ok, "ERROR: #{@command_name} - Documents did not validate.")
 
-    state(@state, :reject, stdout: [
+    Server.put(pid, :reject, stdout: [
       ~r/Running \[.*\] checks on/,
       ~r/Checking \d+ external links\.\.\./,
       ~r/Ran on \d+ files!/,
       ~r/htmlproof [0-9.]+ \|/,
     ])
 
-    state(@state, :reject, stderr: [
+    Server.put(pid, :reject, stderr: [
       # Local errors, when /docs/ exists
       "linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist",
 
@@ -37,19 +37,21 @@ defmodule Krill.Htmlproof do
     :ok
   end
 
-  def process_std do
+  def process_std(pid) do
     #stdout
-    stdout = read!(@state, :stdout_raw) |> 
-      accept(@state, :stdout) |>
-      reject(@state, :stdout)
-    state(@state, :stdout, stdout)
+    stdout = Server.get(pid, :stdout_raw) |>
+      Parser.accept(Server.get(pid, :accept)[:stdout]) |> 
+      Parser.reject(Server.get(pid, :reject)[:stdout])
+    Server.put(pid, :stdout, stdout)
+
 
     #stderr
-    stderr = read!(@state, :stderr_raw) |> 
-      reject(@state, :stderr) |>
-      discard_favicons_on_redirects |>
-      discard_files_no_errors
-    state(@state, :stderr_raw, stderr)
+    stderr = Server.get(pid, :stderr_raw) |>
+      Parser.accept(Server.get(pid, :accept)[:stderr]) |> 
+      Parser.reject(Server.get(pid, :reject)[:stderr]) |>
+        discard_favicons_on_redirects |>
+        discard_files_no_errors
+    Server.put(pid, :stderr, stderr)
 
     :ok
   end
@@ -81,25 +83,25 @@ defmodule Krill.Htmlproof do
   end
 
   # Improve OK/ERRROR messages  
-  defp capture do
-    stdout_raw = read!(@state, :stdout_raw) 
-    stderr_raw = read!(@state, :stderr_raw) 
+  defp capture(pid) do
+    stdout_raw = Server.get(pid, :stdout_raw) 
+    stderr_raw = Server.get(pid, :stderr_raw) 
 
     IO.puts "STDOUT_RAW" <> stdout_raw
     #exit :kill
     # Grab total number of documents and errors
     [_, total_files] = Regex.run(~r/Ran on (\d+) files!/, stdout_raw)
     [_, total_external_links] = Regex.run(~r/Checking (\d+) external links/, stdout_raw)
-    total_errors = accept(stderr_raw, [~r/^\s+\*\s+/]) |> count_lines
-    error_files = accept(stderr_raw, [~r/^-\s+/]) |> count_lines
+    total_errors = Parser.accept(stderr_raw, [~r/^\s+\*\s+/]) |> Parser.count_lines
+    error_files = Parser.accept(stderr_raw, [~r/^-\s+/]) |> Parser.count_lines
     
     if is_integer(total_files) do
-      msg_ok = "OK: #{state(@state, :command_name)} - #{total_files} documents have been validated."
-      state(@state, :message_ok, msg_ok)
+      msg_ok = "OK: #{Server.get(pid, :command_name)} - #{total_files} documents have been validated."
+      Server.get(pid, :message_ok, msg_ok)
     end
 
     if is_integer(total_errors) do
-      msg_error = "ERROR: #{state(@state, :command_name)} - #{total_errors} errors found in #{error_files} documents."
+      msg_error = "ERROR: #{Server.get(pid, :command_name)} - #{total_errors} errors found in #{error_files} documents."
       # Show number of documents and links if available
       if is_integer(total_errors) do
         msg_error = msg_error <> " Total Documents: #{total_files}."
@@ -107,7 +109,7 @@ defmodule Krill.Htmlproof do
       if is_integer(total_external_links) do
         msg_error = msg_error <> " Total Links: #{total_external_links}."
       end
-      state(@state, :message_error, msg_error)
+      Server.get(pid, :message_error, msg_error)
     end
 
     :ok

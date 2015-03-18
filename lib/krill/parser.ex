@@ -24,6 +24,8 @@ defmodule Krill.Parser do
       Enum.count(text, fn(line) -> lines =~ pattern end)
   end
 
+  def accept(nil, _rules), do: nil
+  def accept(text, nil) when is_bitstring(text), do: text
   def accept(text, rules) when is_bitstring(text) and is_list(rules) do
     String.split(text, "\n")
       |> Enum.filter(fn(line) ->
@@ -34,6 +36,8 @@ defmodule Krill.Parser do
       |> Enum.join("\n")
   end
 
+  def reject(nil, _rules), do: nil
+  def reject(text, nil) when is_bitstring(text), do: text
   def reject(text, rules) when is_bitstring(text) and is_list(rules) do
     String.split(text, "\n")
       |> Enum.reject(fn(line) ->
