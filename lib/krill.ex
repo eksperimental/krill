@@ -22,10 +22,14 @@ defmodule Krill do
         {:ok, pid} = Server.start_link(module, %Server.Exec{})
         IO.puts inspect(pid)
         :ok = new(pid)
-        %{stdout: stdout, stderr: stderr} = Server.get_exec(pid)
+        Server.get_exec(pid)
         capture(pid)
         :ok = process_std(pid)
-        {:ok, pid}
+        IO.puts "STATE: " <> inspect(Server.state(pid))
+        #{:ok, pid}
+
+        #Server.stop(pid, "Finally")
+        #Server.terminate("Finally")
       end
 
       def init(options) do
@@ -66,6 +70,14 @@ defmodule Krill.Server do
     GenServer.start_link(__MODULE__, args, name: {:global, module})
   end
 
+  def stop(pid, reason \\ nil) do
+    GenServer.cast pid, {:stop, reason}  
+  end
+
+  def terminate(_reason, _state \\ nil) do
+    :ok
+  end
+
   def get(pid, field) do
     GenServer.call pid, {:get, field}
   end
@@ -83,7 +95,7 @@ defmodule Krill.Server do
   end
 
   def state(pid, new_state) do
-    GenServer.call pid, {:state, new_state}
+    GenServer.cast pid, {:state, new_state}
   end
 
   def get_exec(pid) do
@@ -95,8 +107,6 @@ defmodule Krill.Server do
 
   def handle_call(:get_exec, _from, state) do
     if is_nil(state) or is_nil(state.output) do
-      IO.puts state.command
-      IO.puts state.input
       output = exec(state.command, state.input)
       updated = %{state | output: output}
       { :reply, updated, updated }      
@@ -118,12 +128,16 @@ defmodule Krill.Server do
     { :reply, state, state }
   end
 
-  def handle_call({:state, new_state}, _from, _state) do
-    { :reply, new_state, new_state }
+  def handle_cast({:state, new_state}, state) do
+    { :noreply, new_state, new_state }
   end
 
   def handle_cast({:put, {field, value}}, state) do
     { :noreply, Map.put(state, field, value) }
+  end
+
+  def handle_cast({:stop, reason}, state) do
+    { :stop, reason, state}
   end
 
   ###################
@@ -137,25 +151,31 @@ defmodule Krill.Server do
     unless is_nil(input),
     do: opts = [input: input] ++ opts
 
-    %Process{pid: _pid} = Porcelain.spawn_shell(command, opts)
+    #%Process{pid: _pid}
+    process = Porcelain.spawn_shell(command, opts)
+    Process.await(process)
     #handle_output(pid, dict)
   end
 
   #TODO
   def handle_info(_info={_pid, :data, :out, data}, state) do
-    new_state = %{state | stdout_raw: data}
-    IO.puts "out:" <> inspect(new_state)
-    IO.puts "pid:" <> inspect(self())
+    #new_state = %{state | stdout_raw: data}
+    new_state = Map.put(state, :stdout_raw, data)
+
+    #IO.puts "out:" <> inspect(new_state)
+    #IO.puts "pid:" <> inspect(self())
+    #IO.puts "state:" <> inspect( state(self) )
     state(self(), new_state)
-    IO.puts "state:" <> inspect( state(self) )
     #handle_info(_info, new_state)
+    {:noreply, new_state}
   end
  
   def handle_info(_info={_pid, :data, :err, data}, state) do
-    new_state = %{state | stderr_raw: data}
+    new_state = Map.put(state, :stderr_raw, data)
     IO.puts "err:" <> inspect(new_state)
     state(self(), new_state)
     #handle_info(_info, new_state)
+    {:noreply, new_state}
   end
  
   def handle_info(_info={_pid, :result, %Result{status: status}}, state) do
