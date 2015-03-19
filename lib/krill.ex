@@ -26,18 +26,19 @@ defmodule Krill do
         capture(pid)
         :ok = process_std(pid)
         IO.puts "STATE: " <> inspect(Server.state(pid))
-        #{:ok, pid}
-
-        #Server.stop(pid, "Finally")
-        #Server.terminate("Finally")
+        {:ok, pid}
       end
 
       def init(options) do
-        IO.puts inspect(options)
+        #IO.puts inspect(options)
         {:ok, options}
       end
 
-      defoverridable [new: 1, process_std: 1, capture: 1, run: 1, ]
+      def stop(pid) do
+        Server.stop(pid)
+      end
+
+      defoverridable [new: 1, process_std: 1, capture: 1, run: 1, init: 1, stop: 1, ]
     end
   end
 end
@@ -66,15 +67,35 @@ defmodule Krill.Server do
   #####
   # External API  
 
+  def exec(command, input \\ nil) do
+    opts = [
+      out: {:send, self()},
+      err: {:send, self()}
+    ]
+    
+    unless is_nil(input),
+    do: opts = [input: input] ++ opts
+
+    process = Porcelain.spawn_shell(command, opts)
+    Process.await(process)
+  end
+
   def start_link(module, args) do
     GenServer.start_link(__MODULE__, args, name: {:global, module})
   end
 
-  def stop(pid, reason \\ nil) do
-    GenServer.cast pid, {:stop, reason}  
+  @doc "Stops the server"
+  def stop(pid) do
+    GenServer.call(pid, :stop)
   end
 
-  def terminate(_reason, _state \\ nil) do
+  # def stop(pid, reason \\ nil) do
+  #   GenServer.cast pid, {:stop, reason}  
+  # end
+
+  def terminate(reason, state) do
+    IO.puts "Process Terminated. Reason: #{inspect reason}"
+    IO.puts "State: " <> inspect(state)
     :ok
   end
 
@@ -109,55 +130,59 @@ defmodule Krill.Server do
     if is_nil(state) or is_nil(state.output) do
       output = exec(state.command, state.input)
       updated = %{state | output: output}
-      { :reply, updated, updated }      
+      {:reply, updated, updated}
     else
-      { :reply, state, state }
+      {:reply, state, state}
     end
   end
 
   def handle_call({:get, field}, _from, state) do
-    { :reply, Map.get(state, field), state }
+    {:reply, Map.get(state, field), state}
   end
 
   def handle_call({:update, item}, _from, state) do
     result = Map.merge(state, item)
-    { :reply, result, result }
+    {:reply, result, result}
   end
 
   def handle_call(:state, _from, state) do
-    { :reply, state, state }
+    {:reply, state, state}
   end
 
-  def handle_cast({:state, new_state}, state) do
-    { :noreply, new_state, new_state }
+  def handle_cast({:state, new_state}, _state) do
+    {:noreply, new_state, new_state}
   end
 
   def handle_cast({:put, {field, value}}, state) do
-    { :noreply, Map.put(state, field, value) }
+    {:noreply, Map.put(state, field, value)}
   end
 
-  def handle_cast({:stop, reason}, state) do
-    { :stop, reason, state}
+  @doc "Handle the server stop message"
+  def handle_call(:stop, _from, state) do
+    {:stop, :normal, state}
   end
 
-  ###################
-  # PORCELAIN
-  def exec(command, input \\ nil) do
-    opts = [
-      out: {:send, self()},
-      err: {:send, self()}
-    ]
-    
-    unless is_nil(input),
-    do: opts = [input: input] ++ opts
+  # def handle_cast({:stop, reason}, state) do
+  #   { :stop, reason, state}
+  # end
 
-    #%Process{pid: _pid}
-    process = Porcelain.spawn_shell(command, opts)
-    Process.await(process)
-    #handle_output(pid, dict)
+  def handle_info(_info={_pid, :data, :out, data}, state) do
+    #new_state = %{state | stdout_raw: data}
+    new_state = Map.put(state, :stdout_raw, data)
+
+    #IO.puts "out:" <> inspect(new_state)
+    #IO.puts "pid:" <> inspect(self())
+    #IO.puts "state:" <> inspect( state(self) )
+    state(self(), new_state)
+    #handle_info(_info, new_state)
+    {:noreply, new_state}
   end
 
-  #TODO
+  def handle_info(info={ :EXIT, _conn, _reason }, state) do
+    IO.puts "FINISHED! INFO: #{inspect info}"
+    { :noreply, state }
+  end
+
   def handle_info(_info={_pid, :data, :out, data}, state) do
     #new_state = %{state | stdout_raw: data}
     new_state = Map.put(state, :stdout_raw, data)
@@ -180,9 +205,7 @@ defmodule Krill.Server do
  
   def handle_info(_info={_pid, :result, %Result{status: status}}, state) do
     IO.puts "status: #{status}"
-    #capture
-    #process_std
-    { :noreply, state }
+    {:noreply, state}
   end
 
 end

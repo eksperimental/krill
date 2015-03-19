@@ -1,6 +1,5 @@
 defmodule Krill.Sample do
   use Krill, name: {:global, __MODULE__}
-
   @command_name "Sample Command"
 
   def new(pid) do
@@ -20,7 +19,7 @@ defmodule Krill.Sample do
 
   def process_std(pid) do
     #stdout
-    IO.puts inspect(Server.get(pid, :stdout_raw))
+    #IO.puts inspect(Server.get(pid, :stdout_raw))
 
     stdout = Server.get(pid, :stdout_raw) |>
       Parser.reject(Server.get(pid, :reject)[:stdout])
@@ -31,11 +30,6 @@ defmodule Krill.Sample do
     Server.put(pid, :stderr, stderr)
 
     :ok
-  end
-
-  def terminate(reason, state) do
-    IO.puts "I'm dead: Reason " <> inspect(reason) <> ". State: "
-    IO.puts inspect(state)
   end
 
 end

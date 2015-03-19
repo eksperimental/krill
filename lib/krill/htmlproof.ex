@@ -1,8 +1,7 @@
 defmodule Krill.Htmlproof do
-  @name {:global, __MODULE__}
-  use Krill, name: @name
-
+  use Krill, name: {:global, __MODULE__}
   @command_name "htmlproof"
+  @command "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash"
 
   @moduledoc """
   """
@@ -11,27 +10,27 @@ defmodule Krill.Htmlproof do
   Creates a new feeder
   """
   def new(pid) do
-    #Server.put(pid, :command, "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
-    Server.put(pid, :command, "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash")
+    Server.put(pid, :command, @command)
 
     # default messages
     Server.put(pid, :message_ok, "OK: #{@command_name} - Documents have been validated.")
     Server.put(pid, :message_ok, "ERROR: #{@command_name} - Documents did not validate.")
 
-    Server.put(pid, :reject, stdout: [
-      ~r/Running \[.*\] checks on/,
-      ~r/Checking \d+ external links\.\.\./,
-      ~r/Ran on \d+ files!/,
-      ~r/htmlproof [0-9.]+ \|/,
-    ])
+    Server.put(pid, :reject, [
+      stdout: [
+        ~r/Running \[.*\] checks on/,
+        ~r/Checking \d+ external links\.\.\./,
+        ~r/Ran on \d+ files!/,
+        ~r/htmlproof [0-9.]+ \|/,
+      ],
+      stderr: [
+        # Local errors, when /docs/ exists
+        "linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist",
 
-    Server.put(pid, :reject, stderr: [
-      # Local errors, when /docs/ exists
-      "linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist",
-
-      # Remote errors, when /docs/ doesn't exist
-      ~r/internally linking to \/docs\/.*, which does not exist/,
-      ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
+        # Remote errors, when /docs/ doesn't exist
+        ~r/internally linking to \/docs\/.*, which does not exist/,
+        ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
+      ],
     ])
     
     :ok
@@ -43,7 +42,6 @@ defmodule Krill.Htmlproof do
       Parser.accept(Server.get(pid, :accept)[:stdout]) |> 
       Parser.reject(Server.get(pid, :reject)[:stdout])
     Server.put(pid, :stdout, stdout)
-
 
     #stderr
     stderr = Server.get(pid, :stderr_raw) |>
