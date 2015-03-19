@@ -17,6 +17,7 @@ defmodule Krill.Mixfile do
   def application do
     [
       applications: [:logger, :porcelain, :dbg, ],
+      #mod: {Krill.Sample, []},
       #mod: {Krill, []},
       #mod: {Loader, []},
     ]

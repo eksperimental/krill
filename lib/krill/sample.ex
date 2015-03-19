@@ -1,5 +1,6 @@
 defmodule Krill.Sample do
   use Krill, name: {:global, __MODULE__}
+  use Application
   
   @command_name "Sample Command"
   @command      "echo 'foo bar'"
@@ -31,4 +32,5 @@ defmodule Krill.Sample do
     :ok
   end
 
+  def start(_type, _args), do: run()
 end

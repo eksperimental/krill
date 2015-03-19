@@ -19,14 +19,18 @@ defmodule Krill do
       def process_std(pid), do: :ok
       def capture(pid), do: nil
 
-      def run(module \\ __MODULE__) do
-        {:ok, pid} = Server.start_link(module, %Server.Command{})
+      def start do
+        Server.start_link(__MODULE__, %Server.Command{})
+      end
+
+      def run do
+        {:ok, pid} = start()
         Logger.debug("PID: #{inspect(pid)}")
         :ok = new(pid)
         Server.get_process(pid)
         capture(pid)
         :ok = process_std(pid)
-        Logger.debug("STATE: #{inspect(Server.state(pid))}")
+        Logger.debug("FINAL STATE: #{inspect(Server.state(pid))}")
         {:ok, pid}
       end
 
@@ -38,7 +42,7 @@ defmodule Krill do
         Server.stop(pid)
       end
 
-      defoverridable [new: 1, process_std: 1, capture: 1, run: 1, init: 1, stop: 1, ]
+      defoverridable [start: 0, new: 1, process_std: 1, capture: 1, run: 0, init: 1, stop: 1, ]
     end
   end
 end
@@ -60,7 +64,8 @@ defmodule Krill.Server do
       accept: [stdout: nil, stderr: nil],
       reject: [stdout: nil, stderr: nil], 
       process: nil,
-      response: nil,
+      result: nil,
+      status: nil,
     ]
   end
 
@@ -92,7 +97,7 @@ defmodule Krill.Server do
   end
 
   @doc "Replace current_state with `new_state`"
-  def state(pid, new_state) do
+  def state(pid, new_state) when is_map(new_state) do
     GenServer.cast pid, {:state, new_state}
   end
 
@@ -101,9 +106,9 @@ defmodule Krill.Server do
     GenServer.call pid, {:get, field}
   end
 
-  @doc "Merge new_state into current_state"
-  def merge(pid, new_state) do
-    GenServer.call pid, {:merge, new_state}
+  @doc "Merge `items` into current_state"
+  def merge(pid, items) when is_map(items) do
+    GenServer.call pid, {:merge, items}
   end
 
   @doc "Put field, value pair into state"
@@ -155,8 +160,9 @@ defmodule Krill.Server do
     {:reply, Map.get(state, field), state}
   end
 
-  def handle_call({:merge, item}, _from, state) do
-    new_state = Map.merge(state, item)
+  def handle_call({:merge, items}, _from, state) do
+    IO.puts 
+    new_state = Map.merge(state, items)
     {:reply, new_state, new_state}
   end
 
@@ -166,7 +172,7 @@ defmodule Krill.Server do
   end
 
   def handle_cast({:state, new_state}, _state) do
-    {:noreply, new_state, new_state}
+    {:noreply, new_state}
   end
 
   def handle_cast({:put, {field, value}}, state) do
@@ -190,9 +196,16 @@ defmodule Krill.Server do
     {:noreply, new_state}
   end
  
-  def handle_info(_info={_pid, :result, %Result{status: _status}}, state) do
-    Logger.debug("status: #{_status}")
-    {:noreply, state}
+  def handle_info(_info={_pid, :result, result=%Result{status: status}}, state) do
+    Logger.debug("info: #{inspect _info}")
+    
+    item = %{status: status, result: result}
+    Logger.debug("item: #{inspect item}")
+
+    new_state = merge(self(), item)
+    
+    Logger.debug("new_state: #{inspect new_state}")
+    { :noreply, new_state}
   end
 
 end
