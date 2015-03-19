@@ -16,7 +16,7 @@ defmodule Krill.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [
-      applications: [:logger, :porcelain, ],
+      applications: [:logger, :porcelain, :dbg, ],
       #mod: {Krill, []},
       #mod: {Loader, []},
     ]
@@ -36,6 +36,8 @@ defmodule Krill.Mixfile do
       {:sh, git: "https://github.com/devinus/sh", tag: "1.1.1"},
       #{:erlexec, git: "https://github.com/saleyn/erlexec"},
       {:porcelain, git: "https://github.com/alco/porcelain"},
+      {:dbg, github: "fishcakez/dbg"},
+      {:quaff, github: "qhool/quaff"},
     ]
   end
 end

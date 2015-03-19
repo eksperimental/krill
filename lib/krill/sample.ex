@@ -1,9 +1,11 @@
 defmodule Krill.Sample do
   use Krill, name: {:global, __MODULE__}
+  
   @command_name "Sample Command"
+  @command      "echo 'foo bar'"
 
   def new(pid) do
-    Server.put(pid, :command, "echo 'foo bar'")
+    Server.put(pid, :command, @command)
 
     Server.put(pid, :reject, [
       stdout: [
@@ -18,9 +20,6 @@ defmodule Krill.Sample do
   end
 
   def process_std(pid) do
-    #stdout
-    #IO.puts inspect(Server.get(pid, :stdout_raw))
-
     stdout = Server.get(pid, :stdout_raw) |>
       Parser.reject(Server.get(pid, :reject)[:stdout])
     Server.put(pid, :stdout, stdout)
