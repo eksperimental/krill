@@ -2,6 +2,7 @@ defmodule Krill do
   use Behaviour
   defcallback process_std(pid) :: any
   defcallback new(pid) :: any
+  defcallback config() :: map
 
   defmacro __using__(_opts) do
     quote do
@@ -59,15 +60,17 @@ defmodule Krill do
         stdout = Server.get(pid, :stdout)
         stderr = Server.get(pid, :stderr)
 
-        case stderr do
-          nil ->
-            Logger.debug("STDOUT")
-            IO.puts stdout
+        Logger.debug("STDOUT: #{inspect stdout}")
+        Logger.debug("STDERR: #{inspect stderr}")
 
-          _ ->
-            Logger.debug("STDOERR")
-            IO.puts :stderr, stderr
-            IO.puts stdout
+        if is_bitstring(stdout) and (String.length(stdout) > 0) do
+            Logger.debug("STDOUT")
+            IO.puts "#{inspect stdout}"
+        end
+
+        if is_bitstring(stderr) and (String.length(stderr) > 0) do
+          Logger.debug("STDOERR")
+          IO.puts :stderr, "#{inspect stderr}"
         end
       end
 
@@ -227,17 +230,15 @@ defmodule Krill.Server do
   end
 
   def handle_info(_info={_pid, :data, :out, data}, state) do
-    new_state = Map.put(state, :stdout_raw, data)
-    {:noreply, new_state}
+    { :noreply, Map.put(state, :stdout_raw, "#{state.stdout_raw}\n#{data}") }
   end
  
   def handle_info(_info={_pid, :data, :err, data}, state) do
-    new_state = Map.put(state, :stderr_raw, data)
-    {:noreply, new_state}
+    { :noreply, Map.put(state, :stderr_raw, "#{state.stderr_raw}\n#{data}") }
   end
  
   def handle_info(_info={_pid, :result, result=%Result{status: status}}, state) do
-    { :noreply, Map.merge(state, %{status: status, result: result})}
+    { :noreply, Map.merge(state, %{status: status, result: result}) }
   end
 
 end

@@ -1,14 +1,22 @@
 defmodule Krill.Parser do
 
-  def match_rule?(rule, line) do
+  def match_rule?(rule, line) when is_bitstring(line) do
     cond do
       is_function(rule) ->
         rule.(line)
+      
+      (String.length(line) == 0) and is_bitstring(rule) and (String.length(rule) == 0) ->
+        true
+
+      (String.length(line) == 0) or ( is_bitstring(rule) and (String.length(rule)== 0) ) ->
+        false
+
       true ->
         line =~ rule  #match regex or bitstring
     end
   end
 
+  @doc "Count number of lines in a the string `text`"
   def count_lines(text) do
     String.split(text, "\n") |> 
       Enum.count

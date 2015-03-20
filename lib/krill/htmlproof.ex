@@ -1,34 +1,32 @@
 defmodule Krill.Htmlproof do
-  use Krill, name: {:global, __MODULE__}
-  
-  @command_name "htmlproof"
-  @command      "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash"
+  use Krill
 
-  def new(pid) do
-    Server.put(pid, :command, @command)
+  def config do
+    command_name = "htmlproof"  
+    %{ 
+      name: {:global, __MODULE__},
+      command_name: command_name,
+      #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
+      command: "htmlproof ~/git/eksperimental/krill/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
+      reject: [
+        stdout: [
+          ~r/Running \[.*\] checks on/,
+          ~r/Checking \d+ external links\.\.\./,
+          ~r/Ran on \d+ files!/,
+          ~r/htmlproof [0-9.]+ \|/,
+        ],
+        stderr: [
+          # Local errors, when /docs/ exists
+          "linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist",
 
-    # default messages
-    Server.put(pid, :message_ok, "OK: #{@command_name} - Documents have been validated.")
-    Server.put(pid, :message_ok, "ERROR: #{@command_name} - Documents did not validate.")
-
-    Server.put(pid, :reject, [
-      stdout: [
-        ~r/Running \[.*\] checks on/,
-        ~r/Checking \d+ external links\.\.\./,
-        ~r/Ran on \d+ files!/,
-        ~r/htmlproof [0-9.]+ \|/,
+          # Remote errors, when /docs/ doesn't exist
+          ~r/internally linking to \/docs\/.*, which does not exist/,
+          ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
+        ]
       ],
-      stderr: [
-        # Local errors, when /docs/ exists
-        "linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist",
-
-        # Remote errors, when /docs/ doesn't exist
-        ~r/internally linking to \/docs\/.*, which does not exist/,
-        ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
-      ],
-    ])
-    
-    :ok
+      message_ok: "OK: #{command_name} - Documents have been validated.",
+      message_ok: "ERROR: #{command_name} - Documents did not validate.",
+    }
   end
 
   def process_std(pid) do
@@ -45,32 +43,47 @@ defmodule Krill.Htmlproof do
         discard_favicons_on_redirects |>
         discard_files_no_errors
     Server.put(pid, :stderr, stderr)
+    # stderr = Server.get(pid, :stderr_raw) |>
+    #   Parser.accept(Server.get(pid, :accept)[:stderr]) |>
+    #   Parser.reject(Server.get(pid, :reject)[:stderr])
+    # Server.put(pid, :stderr, stderr)
 
     :ok
   end
 
-  defp discard_favicons_on_redirects(text) do
+#  def process_std(pid) do
+#    Server.put(pid, :stdout, Server.get(pid, :stderr_raw))
+#    Server.put(pid, :stderr, Server.get(pid, :stdout_raw))
+#    :ok
+#  end
+
+  def discard_favicons_on_redirects(text) do
     lines =  text |> String.split("\n")
     
-    lines = Enum.map_reduce(lines, nil, fn(line, current_file)->
+    Logger.debug "DEBUGGING: discard_favicons_on_redirects"
+    #Logger.debug "#{inspect lines}"
+    {result, _} = Enum.map_reduce(lines, "", fn(line, current_file)->
       cond do
-        line =~ ~r/^- / ->
+        Parser.match_rule?(~r/^- /, line) ->
           current_file = line
+
         true ->
           # ignore favicon on redirect pages
-          if current_file =~ "/getting_started/" and lines =~ ~r/\s+\*\s+no favicon specified\n/ do
+          if Parser.match_rule?("/getting_started/", current_file) and
+             Parser.match_rule?(~r/\s+\*\s+no favicon specified/, line) do
             line = nil
-          end
+          end       
       end
-      line
+      #Logger.debug inspect({line, current_file})
+      {line, current_file}
     end)
-
-    Enum.join(lines, "\n")
+    Logger.debug "#{inspect result}"
+    result |> Enum.reject(&(is_nil(&1))) |> Enum.join("\n")
   end
 
   # delete every file that has no errors
   # (ie, any file that is not followed by a line starting with "  *  ")
-  defp discard_files_no_errors(text) do
+  def discard_files_no_errors(text) do
     regex = ~r/\- .*\n(?!\s+\*\s+)/
     Regex.replace(regex, text, "")
   end
@@ -79,8 +92,8 @@ defmodule Krill.Htmlproof do
   defp capture(pid) do
     stdout_raw = Server.get(pid, :stdout_raw)
     stderr_raw = Server.get(pid, :stderr_raw)
-    Logger.debug("STDOUT_RAW:: #{inspect(stdout_raw)}")
-    Logger.debug("STDERR_RAW:: #{inspect(stderr_raw)}")
+    #Logger.debug("STDOUT_RAW:: #{inspect(stdout_raw)}")
+    #Logger.debug("STDERR_RAW:: #{inspect(stderr_raw)}")
 
     # Grab total number of documents and errors
     destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, stdout_raw) )
