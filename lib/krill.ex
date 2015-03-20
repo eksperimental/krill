@@ -3,7 +3,7 @@ defmodule Krill do
   defcallback process_std(pid) :: any
   defcallback new(pid) :: any
 
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     quote do
       use Application
       require Logger
@@ -12,20 +12,25 @@ defmodule Krill do
       alias Krill.Parser
       @behaviour Krill
 
-    if unquote(opts[:name]) do
-      @name unquote(opts[:name])
-    end
-
-      def new(pid), do: :ok
+      def config(), do: %{}
       def process_std(pid), do: :ok
       def capture(pid), do: nil
 
-      def do_start do
+      def new(pid) do
+        unless Enum.empty?(conf = config()),
+        do: Server.merge(pid, conf)
+
+        :ok
+      end
+
+      def start(_type, _args), do: run()
+
+      def start_link do
         Server.start_link(__MODULE__, %Server.Command{})
       end
 
       def run() do
-        case do_start() do
+        case start_link() do
           {:ok, pid} ->
             pid = pid
           {:error, {:already_started, pid}} ->
@@ -35,8 +40,8 @@ defmodule Krill do
 
         :ok = new(pid)
         state = Server.state(pid)
-        #Logger.debug "Running #{state.command_name}"
-        #Logger.debug "$ #{state.command}"
+        Logger.debug "Running #{state.command_name}"
+        Logger.debug "$ #{state.command}"
 
         Server.get_process(pid)
         capture(pid)
@@ -67,7 +72,7 @@ defmodule Krill do
       end
 
       def debug do
-        {:ok, pid}  = do_start()
+        {:ok, pid}  = start_link()
         :ok = new(pid)
         Logger.debug("pid [debug]: #{inspect(pid)}")
         state = Server.state(pid)
@@ -86,7 +91,7 @@ defmodule Krill do
         Server.stop(pid)
       end
 
-      defoverridable [do_start: 0, new: 1, process_std: 1, capture: 1, run: 0, stop: 1, ]
+      defoverridable [config: 0, start: 2, start_link: 0, new: 1, process_std: 1, capture: 1, run: 0, stop: 1, ]
     end
   end
 end

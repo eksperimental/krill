@@ -1,6 +1,5 @@
 defmodule Krill.Htmlproof do
   use Krill, name: {:global, __MODULE__}
-  use Application
   
   @command_name "htmlproof"
   @command      "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash"

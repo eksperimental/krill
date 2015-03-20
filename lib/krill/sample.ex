@@ -1,24 +1,20 @@
 defmodule Krill.Sample do
-  use Krill, name: {:global, __MODULE__}
-  use Application
-  
-  @command_name "Sample Command"
-  @command      "echo 'foo bar'"
+  use Krill
 
-  def new(pid) do
-    Server.put(pid, :command, @command)
-    Server.put(pid, :command_name, @command_name)
-
-    Server.put(pid, :reject, [
-      stdout: [
-        "foobar",
+  def config do
+    %{ 
+      name: {:global, __MODULE__},
+      command_name: "Sample Command",
+      command: "echo 'foo bar'",
+      reject: [
+        stdout: [
+          "foobar",
+        ],
+        stderr: [
+          "foobar",
+        ]
       ],
-      stderr: [
-        "foobar",
-      ]
-    ])
-
-    :ok
+    }
   end
 
   def process_std(pid) do
@@ -33,5 +29,5 @@ defmodule Krill.Sample do
     :ok
   end
 
-  def start(_type, _args), do: run()
+  #def start(_type, _args), do: run()
 end
