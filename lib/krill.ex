@@ -19,20 +19,38 @@ defmodule Krill do
       def process_std(pid), do: :ok
       def capture(pid), do: nil
 
-      def start do
+      def do_start do
         Server.start_link(__MODULE__, %Server.Command{})
       end
 
       def run do
-        {:ok, pid} = start()
-        Logger.debug("PID: #{inspect(pid)}")
+        {:ok, pid} = do_start()
+        Logger.debug("PID [run]: #{inspect(pid)}")
+
         :ok = new(pid)
         Server.get_process(pid)
         capture(pid)
         :ok = process_std(pid)
-        Logger.debug("FINAL STATE: #{inspect(Server.state(pid))}")
+        
+        Logger.debug("FINAL STATE [run]: #{inspect(Server.state(pid))}")
         {:ok, pid}
       end
+
+      def debug do
+        {:ok, pid}  = do_start()
+        :ok = new(pid)
+        Logger.debug("pid [debug]: #{inspect(pid)}")
+        state = Server.state(pid)
+        Logger.debug("state [debug]: #{inspect(state)}")
+        Logger.debug("self() [debug]: #{inspect self}")
+
+        process = Server.do_process(pid, state.command, state.input)
+        Logger.debug("process: #{inspect(process)}")
+        Porcelain.Process.await(process, :infinity)
+        Logger.debug("FINAL STATE [debug]: #{inspect(Server.state(pid))}")
+        {:ok, pid}
+      end
+        
 
       def init(options) do
         {:ok, options}
@@ -42,7 +60,7 @@ defmodule Krill do
         Server.stop(pid)
       end
 
-      defoverridable [start: 0, new: 1, process_std: 1, capture: 1, run: 0, init: 1, stop: 1, ]
+      defoverridable [do_start: 0, new: 1, process_std: 1, capture: 1, run: 0, init: 1, stop: 1, ]
     end
   end
 end
@@ -50,7 +68,6 @@ end
 defmodule Krill.Server do
   require Logger
   use GenServer              
-  alias Porcelain.Process
   alias Porcelain.Result
 
   defmodule Command do
@@ -77,7 +94,7 @@ defmodule Krill.Server do
   end
 
   def get_process(pid) do
-    GenServer.call pid, :get_process
+    GenServer.call pid, {:get_process, pid}
   end
 
   @doc "Stops the server"
@@ -118,37 +135,47 @@ defmodule Krill.Server do
 
   #####
   # Internal Functions
-  def do_process(command, input) do
+  def do_process(pid, command, input) do
+    Logger.debug("pid (passed) [do_process]: #{inspect pid}")
+    Logger.debug("self() [do_process]: #{inspect self}")
+
     opts = [
-      out: {:send, self()},
-      err: {:send, self()},
+      out: {:send, pid},
+      err: {:send, pid},
     ]
     
     unless is_nil(input),
     do: opts = [input: input] ++ opts
 
-    Logger.debug("Current Line: #{__ENV__.line}")
-    process = Porcelain.spawn_shell(command, opts)
-    Logger.debug("Current Line: #{__ENV__.line}")
-    Logger.debug("PROCESS: #{inspect(process)}")
-    #Process.await(process, :infinity)
-    process
+    Porcelain.spawn_shell(command, opts)
+    #Porcelain.shell(command)
   end
 
   #####
   # GenServer implementation
 
-  def handle_call(:get_process, _from, state) do
-    if is_nil Map.get(state, :process) do
-      process = do_process(state.command, state.input)
-      Logger.debug("Current Line: #{__ENV__.line}")
-      Process.await(process)
-      Logger.debug("Current Line: #{__ENV__.line}")
-      new_state = Map.put(state, :process, process)
-      Logger.debug("NEW STATE: #{inspect(new_state)}")
-      {:reply, new_state, new_state}
-    else
-      {:reply, state, state}
+  def handle_call({:get_process, pid}, _from, state) do
+    Logger.debug("pid (passed) [handle_call]: #{inspect pid}")
+    Logger.debug("self() [handle_call]: #{inspect self}")
+    Logger.debug("from [handle_call]: #{inspect _from}")
+
+    case Map.get(state, :process) do
+      nil ->
+        #opts = [
+        #  out: {:send, self()},
+        #  err: {:send, self()},
+        #  input: state.input,
+        #]
+        #process = Porcelain.spawn_shell(state.command, opts)
+
+        process = do_process(pid, state.command, state.input)
+        Logger.debug("process: #{inspect process}")
+        Porcelain.Process.await(process, :infinity)
+        new_state = Map.put(state, :process, process)
+        {:reply, new_state, new_state}
+
+      _ ->
+        {:reply, state, state}
     end
   end
 
@@ -161,8 +188,8 @@ defmodule Krill.Server do
   end
 
   def handle_call({:merge, items}, _from, state) do
-    IO.puts 
     new_state = Map.merge(state, items)
+    Logger.debug("MERGE new state: #{inspect new_state}")
     {:reply, new_state, new_state}
   end
 
@@ -176,6 +203,9 @@ defmodule Krill.Server do
   end
 
   def handle_cast({:put, {field, value}}, state) do
+    Logger.debug("PUT field: #{inspect field}")
+    Logger.debug("PUT value: #{inspect value}")
+    Logger.debug("NEW_STATE: #{inspect Map.put(state, field, value)}")
     {:noreply, Map.put(state, field, value)}
   end
 
@@ -185,25 +215,28 @@ defmodule Krill.Server do
   # end
 
   def handle_info(_info={_pid, :data, :out, data}, state) do
+    Logger.debug("OUT (#{inspect self}): #{inspect data}")
     new_state = Map.put(state, :stdout_raw, data)
-    state(self(), new_state)
+    #state(self(), new_state)
     {:noreply, new_state}
   end
  
   def handle_info(_info={_pid, :data, :err, data}, state) do
+    Logger.debug("ERR (#{inspect self}): #{inspect data}")
     new_state = Map.put(state, :stderr_raw, data)
-    state(self(), new_state)
+    #state(self(), new_state)
     {:noreply, new_state}
   end
  
   def handle_info(_info={_pid, :result, result=%Result{status: status}}, state) do
+    Logger.debug("RESULT (#{inspect self}): #{inspect result}")
     Logger.debug("info: #{inspect _info}")
-    
-    item = %{status: status, result: result}
-    Logger.debug("item: #{inspect item}")
-
-    new_state = merge(self(), item)
-    
+    Logger.debug("status: #{inspect status}")
+    Logger.debug("result: #{inspect result}")
+    #put(self(), :status, status)
+    #put(self(), :result, result)
+    #new_state = state(self())
+    new_state = Map.merge(state, %{status: status, result: result})
     Logger.debug("new_state: #{inspect new_state}")
     { :noreply, new_state}
   end
