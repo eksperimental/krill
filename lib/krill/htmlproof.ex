@@ -1,15 +1,10 @@
 defmodule Krill.Htmlproof do
   use Krill, name: {:global, __MODULE__}
+  use Application
   
   @command_name "htmlproof"
   @command      "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash"
 
-  @moduledoc """
-  """
-
-  @doc """
-  Creates a new feeder
-  """
   def new(pid) do
     Server.put(pid, :command, @command)
 
@@ -83,20 +78,21 @@ defmodule Krill.Htmlproof do
 
   # Improve OK/ERRROR messages  
   defp capture(pid) do
-    stdout_raw = Server.get(pid, :stdout_raw) 
-    stderr_raw = Server.get(pid, :stderr_raw) 
+    stdout_raw = Server.get(pid, :stdout_raw)
+    stderr_raw = Server.get(pid, :stderr_raw)
+    Logger.debug("STDOUT_RAW:: #{inspect(stdout_raw)}")
+    Logger.debug("STDERR_RAW:: #{inspect(stderr_raw)}")
 
-    IO.puts "STDOUT_RAW" <> stdout_raw
-    #exit :kill
     # Grab total number of documents and errors
-    [_, total_files] = Regex.run(~r/Ran on (\d+) files!/, stdout_raw)
-    [_, total_external_links] = Regex.run(~r/Checking (\d+) external links/, stdout_raw)
+    destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, stdout_raw) )
+    destructure( [_, total_external_links], Regex.run(~r/Checking (\d+) external links/, stdout_raw) )
+
     total_errors = Parser.accept(stderr_raw, [~r/^\s+\*\s+/]) |> Parser.count_lines
     error_files = Parser.accept(stderr_raw, [~r/^-\s+/]) |> Parser.count_lines
     
     if is_integer(total_files) do
       msg_ok = "OK: #{Server.get(pid, :command_name)} - #{total_files} documents have been validated."
-      Server.get(pid, :message_ok, msg_ok)
+      Server.put(pid, :message_ok, msg_ok)
     end
 
     if is_integer(total_errors) do
@@ -108,7 +104,7 @@ defmodule Krill.Htmlproof do
       if is_integer(total_external_links) do
         msg_error = msg_error <> " Total Links: #{total_external_links}."
       end
-      Server.get(pid, :message_error, msg_error)
+      Server.put(pid, :message_error, msg_error)
     end
 
     :ok

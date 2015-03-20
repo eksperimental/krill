@@ -7,6 +7,7 @@ defmodule Krill.Sample do
 
   def new(pid) do
     Server.put(pid, :command, @command)
+    Server.put(pid, :command_name, @command_name)
 
     Server.put(pid, :reject, [
       stdout: [
