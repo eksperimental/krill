@@ -5,7 +5,7 @@ defmodule Krill.Sample do
     %{ 
       name: {:global, __MODULE__},
       command_name: "Sample Command",
-      #command: "echo 'foo bar'; echo 'bad' >&2",
+      #command: "echo 'foo bar'",
       command: "./lib/krill/sample.sh",
       reject: [
         stdout: [
@@ -18,16 +18,10 @@ defmodule Krill.Sample do
     }
   end
 
-  def process_std(pid) do
-    stdout = Server.get(pid, :stdout_raw) |>
-      Parser.reject(Server.get(pid, :reject)[:stdout])
-    Server.put(pid, :stdout, stdout)
-
-    stderr = Server.get(pid, :stderr_raw) |>
-      Parser.reject(Server.get(pid, :reject)[:stderr])
-    Server.put(pid, :stderr, stderr)
-
-    :ok
+  def process_std(state) do
+    stdout = Parser.reject(state[:stdout_raw], state[:reject][:stdout])
+    stderr = Parser.reject(state[:stderr_raw], state[:reject][:stderr])
+    Map.merge(state, %{stdout: stdout, stderr: stderr})
   end
   
 end
