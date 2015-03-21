@@ -28,6 +28,5 @@ defmodule Krill.Sample do
 
     :ok
   end
-
-  #def start(_type, _args), do: run()
+  
 end

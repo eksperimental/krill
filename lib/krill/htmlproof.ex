@@ -6,8 +6,8 @@ defmodule Krill.Htmlproof do
     %{ 
       name: {:global, __MODULE__},
       command_name: command_name,
-      #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
-      command: "htmlproof ~/git/eksperimental/krill/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
+      command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
+      #command: "htmlproof ~/git/eksperimental/krill/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
       reject: [
         stdout: [
           ~r/Running \[.*\] checks on/,
@@ -43,25 +43,14 @@ defmodule Krill.Htmlproof do
         discard_favicons_on_redirects |>
         discard_files_no_errors
     Server.put(pid, :stderr, stderr)
-    # stderr = Server.get(pid, :stderr_raw) |>
-    #   Parser.accept(Server.get(pid, :accept)[:stderr]) |>
-    #   Parser.reject(Server.get(pid, :reject)[:stderr])
-    # Server.put(pid, :stderr, stderr)
 
     :ok
   end
 
-#  def process_std(pid) do
-#    Server.put(pid, :stdout, Server.get(pid, :stderr_raw))
-#    Server.put(pid, :stderr, Server.get(pid, :stdout_raw))
-#    :ok
-#  end
-
   def discard_favicons_on_redirects(text) do
     lines =  text |> String.split("\n")
     
-    Logger.debug "DEBUGGING: discard_favicons_on_redirects"
-    #Logger.debug "#{inspect lines}"
+    #Logger.debug "DEBUGGING: discard_favicons_on_redirects"
     {result, _} = Enum.map_reduce(lines, "", fn(line, current_file)->
       cond do
         Parser.match_rule?(~r/^- /, line) ->
@@ -74,18 +63,16 @@ defmodule Krill.Htmlproof do
             line = nil
           end       
       end
-      #Logger.debug inspect({line, current_file})
       {line, current_file}
     end)
-    Logger.debug "#{inspect result}"
-    result |> Enum.reject(&(is_nil(&1))) |> Enum.join("\n")
+    #Logger.debug "#{inspect result}"
+    result |> Parser.reject_empty_or_nil |> Enum.join("\n")
   end
 
   # delete every file that has no errors
   # (ie, any file that is not followed by a line starting with "  *  ")
   def discard_files_no_errors(text) do
-    regex = ~r/\- .*\n(?!\s+\*\s+)/
-    Regex.replace(regex, text, "")
+    Regex.replace(~r/\- .*\n(?!\s+\*\s+)/, text, "")
   end
 
   # Improve OK/ERRROR messages  
@@ -102,18 +89,18 @@ defmodule Krill.Htmlproof do
     total_errors = Parser.accept(stderr_raw, [~r/^\s+\*\s+/]) |> Parser.count_lines
     error_files = Parser.accept(stderr_raw, [~r/^-\s+/]) |> Parser.count_lines
     
-    if is_integer(total_files) do
+    if total_files do
       msg_ok = "OK: #{Server.get(pid, :command_name)} - #{total_files} documents have been validated."
       Server.put(pid, :message_ok, msg_ok)
     end
 
-    if is_integer(total_errors) do
+    if total_errors do
       msg_error = "ERROR: #{Server.get(pid, :command_name)} - #{total_errors} errors found in #{error_files} documents."
       # Show number of documents and links if available
-      if is_integer(total_errors) do
+      if total_errors do
         msg_error = msg_error <> " Total Documents: #{total_files}."
       end
-      if is_integer(total_external_links) do
+      if total_external_links do
         msg_error = msg_error <> " Total Links: #{total_external_links}."
       end
       Server.put(pid, :message_error, msg_error)

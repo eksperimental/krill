@@ -47,7 +47,13 @@ defmodule Krill do
         Server.get_process(pid)
         capture(pid)
         :ok = process_std(pid)
-        
+
+        if is_nil(state.stderr) or "" == state.stderr do
+          Server.put(pid, :status, 0)
+        else
+          Server.put(pid, :status, 1)
+        end
+
         final_state = Server.state(pid)
         Logger.debug("FINAL STATE [run]: #{inspect(final_state)}")
 
@@ -56,21 +62,47 @@ defmodule Krill do
         {:ok, pid, final_state}
       end
 
+      def determine_status(state) do
+        #case state.status_raw do
+        #  0 ->
+        #    if is_nil(state.stderr) or "" == state.stderr do
+        #      0
+        #    else
+        #      1
+        #    end
+        #
+        #  _ ->
+        #    state.status_raw
+        #end
+
+        cond do
+          state.status_raw == 0 and is_nil(state.stderr) ->
+            0
+          state.status_raw == 0 and "" == state.stderr ->
+            1
+          _ ->
+            state.status_raw
+        end
+      end
+
       def output(pid) do
         stdout = Server.get(pid, :stdout)
         stderr = Server.get(pid, :stderr)
 
-        Logger.debug("STDOUT: #{inspect stdout}")
-        Logger.debug("STDERR: #{inspect stderr}")
-
-        if is_bitstring(stdout) and (String.length(stdout) > 0) do
-            Logger.debug("STDOUT")
-            IO.puts "#{inspect stdout}"
+        if is_nil(stderr) or "" == stderr do
+          IO.puts Server.get(pid, :message_ok)
+        else
+          IO.puts Server.get(pid, :message_error)
         end
 
-        if is_bitstring(stderr) and (String.length(stderr) > 0) do
+        if is_bitstring(stdout) and "" != stdout  do
+            Logger.debug("STDOUT")
+            IO.puts(stdout)
+        end
+
+        if is_bitstring(stderr) and "" != stderr do
           Logger.debug("STDOERR")
-          IO.puts :stderr, "#{inspect stderr}"
+          IO.puts :stderr, stderr
         end
       end
 
@@ -80,13 +112,13 @@ defmodule Krill do
         Logger.debug("pid [debug]: #{inspect(pid)}")
         state = Server.state(pid)
         Logger.debug("state [debug]: #{inspect(state)}")
-        Logger.debug("self() [debug]: #{inspect self}")
+        #Logger.debug("self() [debug]: #{inspect self}")
 
         process = Server.do_process(pid, state.command, state.input)
-        Logger.debug("process: #{inspect(process)}")
+        #Logger.debug("process: #{inspect(process)}")
         Porcelain.Process.await(process, :infinity)
         final_state = Server.state(pid)
-        Logger.debug("FINAL STATE [run]: #{inspect(final_state)}")
+        #Logger.debug("FINAL STATE [run]: #{inspect(final_state)}")
         {:ok, pid, final_state}
       end
 
@@ -120,7 +152,7 @@ defmodule Krill.Server do
       stderr: nil, stderr_raw: nil,
       process: nil,
       result: nil,
-      status: nil,
+      status: nil, status_raw: nil,
     ]
   end
 
@@ -141,8 +173,8 @@ defmodule Krill.Server do
   end
 
   def terminate(reason, state) do
-    IO.puts "Process Terminated. Reason: #{inspect reason}"
-    IO.puts "State: #{inspect(state)}"
+    Logger.debug "Process Terminated. Reason: #{inspect reason}"
+    #Logger.debug "State: #{inspect(state)}"
     :ok
   end
 
@@ -189,11 +221,10 @@ defmodule Krill.Server do
   # GenServer implementation
 
   def handle_call({:get_process, pid}, _from, state) do
-    Logger.debug "FROM: #{inspect _from}"
     case Map.get(state, :process) do
       nil ->
         process = do_process(pid, state.command, state.input)
-        Logger.debug("process: #{inspect process}")
+        #Logger.debug("process: #{inspect process}")
         Porcelain.Process.await(process, :infinity)
         new_state = Map.put(state, :process, process)
         {:reply, new_state, new_state}
@@ -238,7 +269,7 @@ defmodule Krill.Server do
   end
  
   def handle_info(_info={_pid, :result, result=%Result{status: status}}, state) do
-    { :noreply, Map.merge(state, %{status: status, result: result}) }
+    { :noreply, Map.merge(state, %{status_raw: status, result: result}) }
   end
 
 end

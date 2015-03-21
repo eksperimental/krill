@@ -41,7 +41,7 @@ defmodule Krill.Parser do
             match_rule?(rule, line)
           end)
         end)
-      |> Enum.join("\n")
+      |> reject_empty_or_nil |> Enum.join("\n")
   end
 
   def reject(nil, _rules), do: nil
@@ -53,7 +53,11 @@ defmodule Krill.Parser do
             match_rule?(rule, line)
           end)
         end)
-      |> Enum.join("\n")
+      |> reject_empty_or_nil |> Enum.join("\n")
   end
 
+  def reject_empty_or_nil(collection) do
+    Enum.reject( collection, &( is_nil(&1) || &1 == "" ) )
+  end
+  
 end
