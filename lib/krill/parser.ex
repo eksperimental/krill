@@ -1,14 +1,17 @@
 defmodule Krill.Parser do
+  import Krill.Macro
 
   def match_rule?(rule, line) when is_bitstring(line) do
     cond do
       is_function(rule) ->
         rule.(line)
       
-      (String.length(line) == 0) and is_bitstring(rule) and (String.length(rule) == 0) ->
+      empty?(line) and empty?(rule) and is_bitstring(rule) ->
+      #(String.length(line) == 0) and is_bitstring(rule) and (String.length(rule) == 0) ->
         true
 
-      (String.length(line) == 0) or ( is_bitstring(rule) and (String.length(rule)== 0) ) ->
+      empty?(line) or ( empty?(rule) and is_bitstring(rule) ) ->
+      #(String.length(line) == 0) or ( is_bitstring(rule) and (String.length(rule)== 0) ) ->
         false
 
       true ->
@@ -22,15 +25,15 @@ defmodule Krill.Parser do
       Enum.count
   end
 
-  defp count_lines(text, function) when is_function(function) do
-    String.split(text, "\n") |> 
-      Enum.count(text, function )
-  end
-
-  defp count_lines(text, pattern) do
-    String.split(text, "\n") |> 
-      Enum.count(text, fn(line) -> lines =~ pattern end)
-  end
+  # defp count_lines(text, function) when is_function(function) do
+  #   String.split(text, "\n") |> 
+  #     Enum.count(text, function )
+  # end
+  
+  # defp count_lines(text, pattern) do
+  #   String.split(text, "\n") |> 
+  #     Enum.count(text, fn(line) -> lines =~ pattern end)
+  # end
 
   def accept(nil, _rules), do: nil
   def accept(text, nil) when is_bitstring(text), do: text
@@ -41,7 +44,7 @@ defmodule Krill.Parser do
             match_rule?(rule, line)
           end)
         end)
-      |> reject_empty_or_nil |> Enum.join("\n")
+      |> reject_empty |> Enum.join("\n")
   end
 
   def reject(nil, _rules), do: nil
@@ -53,11 +56,24 @@ defmodule Krill.Parser do
             match_rule?(rule, line)
           end)
         end)
-      |> reject_empty_or_nil |> Enum.join("\n")
+      |> reject_empty |> Enum.join("\n")
   end
 
-  def reject_empty_or_nil(collection) do
-    Enum.reject( collection, &( is_nil(&1) || &1 == "" ) )
+  def reject_empty(collection) do
+    #new_collection = Enum.reject( collection, &( is_nil(&1) || &1 == "" ) )
+    Enum.reject( collection, &( empty?(&1) ) )
   end
-  
+
+  def join(collection, joiner \\ "") do
+    new_collection = collection
+      |> reject_empty
+
+    #keep last one if empty
+    if empty?( List.last(collection) ) do
+      new_collection = new_collection ++ [""]
+    end
+
+    new_collection |> Enum.join(joiner)
+  end
+
 end

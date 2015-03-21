@@ -9,6 +9,7 @@ defmodule Krill do
       use Application
       require Logger
       import Krill
+      import Krill.Macro
       alias Krill.Server
       alias Krill.Parser
       @behaviour Krill
@@ -37,7 +38,7 @@ defmodule Krill do
           {:error, {:already_started, pid}} ->
             pid = pid
         end
-        Logger.debug("PID [run]: #{inspect(pid)}")
+        Logger.debug "PID [run]: #{inspect(pid)}"
 
         :ok = new(pid)
         state = Server.state(pid)
@@ -47,71 +48,45 @@ defmodule Krill do
         Server.get_process(pid)
         capture(pid)
         :ok = process_std(pid)
-
-        if is_nil(state.stderr) or "" == state.stderr do
-          Server.put(pid, :status, 0)
-        else
-          Server.put(pid, :status, 1)
-        end
+        :ok = Server.put(pid, :status, &Server.determine_status/1)
+        :ok = output(pid)
 
         final_state = Server.state(pid)
-        Logger.debug("FINAL STATE [run]: #{inspect(final_state)}")
+        Logger.debug "FINAL STATE [run]: #{inspect(final_state)}"
+        :ok = Server.stop(pid)
 
-        output(pid)
-        Server.stop(pid)
         {:ok, pid, final_state}
       end
 
-      def determine_status(state) do
-        #case state.status_raw do
-        #  0 ->
-        #    if is_nil(state.stderr) or "" == state.stderr do
-        #      0
-        #    else
-        #      1
-        #    end
-        #
-        #  _ ->
-        #    state.status_raw
-        #end
-
-        cond do
-          state.status_raw == 0 and is_nil(state.stderr) ->
-            0
-          state.status_raw == 0 and "" == state.stderr ->
-            1
-          _ ->
-            state.status_raw
-        end
-      end
-
       def output(pid) do
-        stdout = Server.get(pid, :stdout)
-        stderr = Server.get(pid, :stderr)
+        state = Server.state(pid)
 
-        if is_nil(stderr) or "" == stderr do
-          IO.puts Server.get(pid, :message_ok)
-        else
-          IO.puts Server.get(pid, :message_error)
+        case state.status do
+          0 ->
+            IO.puts state.message_ok
+          _ ->
+            IO.puts state.message_error
         end
 
-        if is_bitstring(stdout) and "" != stdout  do
-            Logger.debug("STDOUT")
-            IO.puts(stdout)
+        unless empty? state.stdout  do
+          Logger.debug "STDOUT"
+          IO.puts( state.stdout )
         end
 
-        if is_bitstring(stderr) and "" != stderr do
-          Logger.debug("STDOERR")
-          IO.puts :stderr, stderr
+        unless empty? state.stderr do
+          Logger.debug "STDERR"
+          IO.puts( :stderr, state.stderr )
         end
+
+        :ok
       end
 
       def debug do
         {:ok, pid}  = start_link()
         :ok = new(pid)
-        Logger.debug("pid [debug]: #{inspect(pid)}")
+        Logger.debug "pid [debug]: #{inspect(pid)}"
         state = Server.state(pid)
-        Logger.debug("state [debug]: #{inspect(state)}")
+        Logger.debug "state [debug]: #{inspect(state)}"
         #Logger.debug("self() [debug]: #{inspect self}")
 
         process = Server.do_process(pid, state.command, state.input)
@@ -172,9 +147,9 @@ defmodule Krill.Server do
     GenServer.call pid, :stop
   end
 
-  def terminate(reason, state) do
+  def terminate(reason, _state) do
     Logger.debug "Process Terminated. Reason: #{inspect reason}"
-    #Logger.debug "State: #{inspect(state)}"
+    #Logger.debug "State: #{inspect(_state)}"
     :ok
   end
 
@@ -217,6 +192,21 @@ defmodule Krill.Server do
     Porcelain.spawn_shell(command, opts)
   end
 
+  def determine_status(state) do
+    cond do
+      !(state.stderr) ->
+        0
+      "" == state.stderr ->
+        0
+      # status_raw is 0, but stderr neither empty, nor falsey
+      state.status_raw == 0 ->
+        1
+      # set same as status_raw
+      true ->
+        state.status_raw
+    end
+  end
+
   #####
   # GenServer implementation
 
@@ -254,6 +244,10 @@ defmodule Krill.Server do
 
   def handle_cast({:state, new_state}, _state) do
     {:noreply, new_state}
+  end
+
+  def handle_cast({:put, {field, fn_value}}, state) when is_function(fn_value) do
+    {:noreply, Map.put(state, field, fn_value.(state))}
   end
 
   def handle_cast({:put, {field, value}}, state) do

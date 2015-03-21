@@ -66,7 +66,7 @@ defmodule Krill.Htmlproof do
       {line, current_file}
     end)
     #Logger.debug "#{inspect result}"
-    result |> Parser.reject_empty_or_nil |> Enum.join("\n")
+    result |> Parser.join("\n")
   end
 
   # delete every file that has no errors

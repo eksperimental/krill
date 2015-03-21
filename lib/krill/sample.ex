@@ -5,7 +5,8 @@ defmodule Krill.Sample do
     %{ 
       name: {:global, __MODULE__},
       command_name: "Sample Command",
-      command: "echo 'foo bar'",
+      #command: "echo 'foo bar'; echo 'bad' >&2",
+      command: "./lib/krill/sample.sh",
       reject: [
         stdout: [
           "foobar",
