@@ -1,8 +1,8 @@
-defmodule Krill.HtmlproofTest do
+defmodule Command.HtmlproofTest do
   use ExUnit.Case, async: true
   require Logger
-  alias Krill.Htmlproof
-  doctest Krill.Htmlproof
+  alias Command.Htmlproof
+  doctest Command.Htmlproof
 
   setup do
     text = File.read!("./sample.log")

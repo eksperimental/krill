@@ -1,8 +1,8 @@
 defmodule Krill do
   use Behaviour
-  defcallback process_std(state) :: map
+  defcallback process_std(map) :: map
   defcallback new :: map
-  defcallback config() :: map
+  defcallback config :: map
 
   defmacro __using__(_opts) do
     quote do
@@ -10,8 +10,9 @@ defmodule Krill do
       require Logger
       import Krill
       import Krill.Macro
-      alias Krill.State
+      require Krill.Process
       alias Krill.Parser
+
       @behaviour Krill
 
       defmodule Command do
@@ -38,9 +39,11 @@ defmodule Krill do
       def process_std(state), do: state
       def capture(state), do: state
 
-      def new do
-        unless Enum.empty?(conf = config()) do
-          Command.merge(%Command{}, conf)
+      def new(conf \\ nil) when is_nil(conf) when is_map(conf) do
+        if is_nil(conf), do: conf = config()
+
+        unless Enum.empty?(conf) do
+          Map.merge(%Command{}, conf)
         else
           %Command{}
         end
@@ -85,23 +88,7 @@ defmodule Krill do
         :ok
       end
 
-      def debug do
-        # {:ok, pid}  = start_link()
-        # :ok = new(pid)
-        # Logger.debug "pid [debug]: #{inspect(pid)}"
-        # state = Server.state(pid)
-        # Logger.debug "state [debug]: #{inspect(state)}"
-        # #Logger.debug("self() [debug]: #{inspect self}")
-        #
-        # process = Server.do_process(pid, state.command, state.input)
-        # #Logger.debug("process: #{inspect(process)}")
-        # Porcelain.Process.await(process, :infinity)
-        # final_state = Server.state(pid)
-        # #Logger.debug("FINAL STATE [run]: #{inspect(final_state)}")
-        # {:ok, pid, final_state}
-      end
-
-      defoverridable [config: 0, start: 2, new: 1, process_std: 1, capture: 1, run: 0, ]
+      defoverridable [config: 0, start: 2, new: 0, process_std: 1, capture: 1, run: 0, ]
     end
   end
 

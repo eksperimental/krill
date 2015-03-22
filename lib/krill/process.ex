@@ -1,17 +1,22 @@
-defmodule Krill.Process
+defmodule Krill.Process do
   alias Porcelain.Result
   require Logger
 
   @moduledoc """
   Deals with anything related to Porcelain.Process and Results
   """
-
+  
   def run(state, timeout \\ :infinity) do
-    case state[:process] do
+    case state.process do
       nil ->
-        process = do_process(state, state.command, state.input)
-        #Logger.debug("process: #{inspect process}")
-        Porcelain.Process.await(process, :infinity)
+        Logger.debug("PID: #{inspect self}")
+        
+        %Porcelain.Process{pid: pid} = process = spawn_process(self, state)
+        state = handle_output(pid, state, timeout)
+        Logger.debug("process: #{inspect process}")
+        {:ok, _result} = Porcelain.Process.await(process, timeout)
+
+        Logger.debug inspect(state)
         Map.put(state, :process, process)
 
       _ ->
@@ -28,13 +33,25 @@ defmodule Krill.Process
 
   #####
   # Internal Functions
-  def do_process(pid, command, input) do
+  def spawn_process(pid, state) do
     opts = [ out: {:send, pid}, err: {:send, pid}, ]
 
-    unless is_nil(input),
-    do: opts = [input: input] ++ opts
+    unless is_nil(state.input),
+    do: opts = [input: state.input] ++ opts
 
-    Porcelain.spawn_shell(command, opts)
+    process = Porcelain.spawn_shell(state.command, opts)
+    #{:ok, _result} = Porcelain.Process.await(process, timeout)
+    process
+  end
+
+  def do_process(pid, state) do
+    #opts = [ out: {:send, pid}, err: {:send, pid}, ]
+    opts = []
+
+    unless is_nil(state.input),
+    do: opts = [input: state.input] ++ opts
+
+    Porcelain.shell(state.command, opts)
   end
 
   def determine_status(state) do
@@ -52,6 +69,21 @@ defmodule Krill.Process
     end
   end
 
+  def handle_output(pid, state, timeout \\ :infinity) do
+    receive do
+      {^pid, :data, :out, data} ->
+         handle_output( pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}\n#{data}"), timeout)
+
+      {^pid, :data, :err, data} ->
+        handle_output( pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}\n#{data}"), timeout)
+
+      {^pid, :result, result=%Result{status: status}} ->
+        Map.merge(state, %{status_raw: status, result: result})
+    after
+      timeout -> IO.puts( :stderr, "timeout" )
+    end
+  end
+
   #####
   # GenServer implementation
 
@@ -66,3 +98,4 @@ defmodule Krill.Process
   def handle_info(_info={_pid, :result, result=%Result{status: status}}, state) do
     { :noreply, Map.merge(state, %{status_raw: status, result: result}) }
   end
+end

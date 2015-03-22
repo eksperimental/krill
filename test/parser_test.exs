@@ -1,8 +1,7 @@
 defmodule Krill.ParserTest do
   use ExUnit.Case, async: true
-
-  doctest Krill.Parser
   alias Krill.Parser
+  doctest Krill.Parser
 
   setup do
     text = File.read!("./sample.log")
@@ -19,10 +18,6 @@ defmodule Krill.ParserTest do
     ]
     {:ok, text: text, rules: rules, }
   end
-
-#  test "the truth" do
-#    assert 1 + 1 == 2
-#  end
 
   test "count lines", %{text: text} do
     assert Parser.count_lines(text) == 15
@@ -75,8 +70,5 @@ discart this line
 
     assert filtered == result
   end
-
-
-
 
 end

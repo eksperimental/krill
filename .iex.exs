@@ -1,2 +1,2 @@
-Krill.Sample.run
-Krill.Htmlproof.run
+#Command.Sample.run
+#Command.Htmlproof.run

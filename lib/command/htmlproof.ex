@@ -1,4 +1,4 @@
-defmodule Krill.Htmlproof do
+defmodule Command.Htmlproof do
   use Krill
 
   def config do
