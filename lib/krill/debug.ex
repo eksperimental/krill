@@ -1,9 +1,9 @@
 defmodule Krill.Debug do
   require Logger
 
-  def run() do
-    Logger.debug "Debugging.."
+  def run(module) do
+    Logger.debug "Debugging..."
     Quaff.Debug.start()
-    Quaff.Debug.load(Krill.Sample)
+    Quaff.Debug.load(module)
   end
 end

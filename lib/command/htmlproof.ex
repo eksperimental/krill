@@ -31,12 +31,12 @@ defmodule Command.Htmlproof do
 
   def process_std(state) do
     #stdout
-    stdout = Parser.accept(state[:stdout_raw], state[:accept][:stdout])
-      |> Parser.reject(state[:stdout_raw], state[:reject][:stdout])
+    stdout = Parser.accept(state.stdout_raw, state.accept[:stdout])
+      |> Parser.reject(state.reject[:stdout])
 
     #stderr
-    stderr = Parser.accept(state[:stderr_raw], state[:accept][:stderr])
-      |> Parser.reject(state[:stderr_raw], state[:reject][:stderr])
+    stderr = Parser.accept(state.stderr_raw, state.accept[:stderr])
+      |> Parser.reject(state.reject[:stderr])
       |> discard_favicons_on_redirects
       |> discard_files_no_errors
 
@@ -73,24 +73,20 @@ defmodule Command.Htmlproof do
 
   # Improve OK/ERRROR messages  
   defp capture(state) do
-    #Logger.debug("STDOUT_RAW:: #{inspect(state[:stdout_raw])}")
-    #Logger.debug("STDERR_RAW:: #{inspect(state[:stderr_raw])}")
-    merge_state = %{}
-
     # Grab total number of documents and errors
-    destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, state[:stdout_raw]) )
-    destructure( [_, total_external_links], Regex.run(~r/Checking (\d+) external links/, state[:stdout_raw]) )
+    destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, state.stdout_raw) )
+    destructure( [_, total_external_links], Regex.run(~r/Checking (\d+) external links/, state.stdout_raw) )
 
-    total_errors = Parser.accept(state[:stderr_raw], [~r/^\s+\*\s+/]) |> Parser.count_lines
-    error_files = Parser.accept(state[:stderr_raw], [~r/^-\s+/]) |> Parser.count_lines
+    total_errors = Parser.accept(state.stderr_raw, [~r/^\s+\*\s+/]) |> Parser.count_lines
+    error_files = Parser.accept(state.stderr_raw, [~r/^-\s+/]) |> Parser.count_lines
     
     if total_files do
-      message_ok = "OK: #{state[:command_name]} - #{total_files} documents have been validated."
+      message_ok = "OK: #{state.command_name} - #{total_files} documents have been validated."
       state = Map.put(state, :message_ok, message_ok)
     end
 
     if total_errors do
-      message_error = "ERROR: #{state[:command_name]} - #{total_errors} errors found in #{error_files} documents."
+      message_error = "ERROR: #{state.command_name} - #{total_errors} errors found in #{error_files} documents."
       # Show number of documents and links if available
       if total_errors do
         message_error = message_error <> " Total Documents: #{total_files}."

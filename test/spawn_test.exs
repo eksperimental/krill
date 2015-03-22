@@ -35,7 +35,7 @@ defmodule Krill.SpawnTest do
     send pid, {self, {:hola, "mundo"} }
     state = handle_output(state)
 
-    Logger.debug "state: #{inspect(state)}"
+    #Logger.debug "state: #{inspect(state)}"
     
     assert state == %{foo: "bar", hola: "Mundo", hello: "World", }
   end

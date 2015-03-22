@@ -1,5 +1,5 @@
 defmodule KrillTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Krill
   use Krill
 
@@ -13,40 +13,40 @@ defmodule KrillTest do
       status_raw: 25,
       stderr: nil,
     })
-    state = Map.put(state, :status, &Map.determine_status/1)
-    assert state[:status] == 0
+    state = put(state, :status, &Krill.Process.determine_status/1)
+    assert state.status == 0
 
     # stderr: false
     state = Map.merge(state, %{
       status_raw: 25,
       stderr: false,
     })
-    state = Map.put(state, :status, &Map.determine_status/1)
-    assert state[:status] == 0
+    state = put(state, :status, &Krill.Process.determine_status/1)
+    assert state.status == 0
 
     # stderr: ""
     state = Map.merge(state, %{
       status_raw: 25,
       stderr: "",
     })
-    state = Map.put(state, :status, &Map.determine_status/1)
-    assert state[:status] == 0
+    state = put(state, :status, &Krill.Process.determine_status/1)
+    assert state.status == 0
 
     # status_raw: 0, but stderr is truthy
     state = Map.merge(state, %{
       status_raw: 0,
       stderr: "foo",
     })
-    state = Map.put(state, :status, &Map.determine_status/1)
-    assert state[:status] == 1
+    state = put(state, :status, &Krill.Process.determine_status/1)
+    assert state.status == 1
 
     # status_raw: not 0, and stderr not empty neither falsey
     state = Map.merge(state, %{
       status_raw: 25,
       stderr: "foo",
     })
-    state = Map.put(state, :status, &Map.determine_status/1)
-    assert state[:status] == 25
+    state = put(state, :status, &Krill.Process.determine_status/1)
+    assert state.status == 25
 
     # Other scenarios
     # stderr: 0
@@ -54,7 +54,7 @@ defmodule KrillTest do
       status_raw: 25,
       stderr: 0,
     })
-    state = Map.put(state, :status, &Map.determine_status/1)
-    assert state[:status] == 25
+    state = put(state, :status, &Krill.Process.determine_status/1)
+    assert state.status == 25
   end
 end

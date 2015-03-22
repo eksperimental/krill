@@ -1,2 +1,2 @@
-#Command.Sample.run
-#Command.Htmlproof.run
+Command.Sample.run
+Command.Htmlproof.run

@@ -44,8 +44,8 @@ defmodule Command.HtmlproofTest do
   *  internal script toc.js does not exist (line 184)
 - something else
 """
-    Logger.debug inspect(text)
-    Logger.debug inspect(result)
+    #Logger.debug inspect(text)
+    #Logger.debug inspect(result)
     assert Htmlproof.discard_favicons_on_redirects(text) == result
   end
 

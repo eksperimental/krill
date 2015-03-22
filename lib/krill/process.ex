@@ -10,19 +10,21 @@ defmodule Krill.Process do
     case state.process do
       nil ->
         Logger.debug("PID: #{inspect self}")
-        
-        %Porcelain.Process{pid: pid} = process = spawn_process(self, state)
-        state = handle_output(pid, state, timeout)
-        Logger.debug("process: #{inspect process}")
-        {:ok, _result} = Porcelain.Process.await(process, timeout)
-
+        opts = [ out: {:send, self}, err: {:send, self}, ]
+        %Porcelain.Process{pid: pid} = process = Porcelain.spawn_shell(state.command, opts)
+        _state_handled = handle_output(self, pid, state)
+        #Porcelain.Process.await(process, timeout)
+        receive do
+          {:ok, state} ->
+            state = state
+        end
+        state = Map.put(state, :process, process)
         Logger.debug inspect(state)
-        Map.put(state, :process, process)
+        {:ok, state}
 
       _ ->
-        state
+        {:ok, state}
     end
-
   end
 
   def terminate(reason, _state) do
@@ -33,6 +35,25 @@ defmodule Krill.Process do
 
   #####
   # Internal Functions
+  def handle_output(sender, pid, state) do
+    receive do
+      { ^pid, :data, :out, data } ->
+        #Logger.debug "OUT: #{inspect(data)}"
+        handle_output( sender, pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}#{data}") )
+
+      { ^pid, :data, :err, data } ->
+        #Logger.debug "ERR: #{inspect(data)}"
+        handle_output( sender, pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}#{data}") )
+
+      { ^pid, :result, result=%Result{status: status} } ->
+        state = Map.merge(state, %{status_raw: status, result: result})
+        #IO.puts "State (handle_output): #{inspect(state)}"
+        send sender, { :ok, state }
+    #after
+    #  :infinity -> IO.puts "timeout"
+    end
+  end
+
   def spawn_process(pid, state) do
     opts = [ out: {:send, pid}, err: {:send, pid}, ]
 
@@ -82,20 +103,5 @@ defmodule Krill.Process do
     after
       timeout -> IO.puts( :stderr, "timeout" )
     end
-  end
-
-  #####
-  # GenServer implementation
-
-  def handle_info(_info={_pid, :data, :out, data}, state) do
-    { :noreply, Map.put(state, :stdout_raw, "#{state.stdout_raw}\n#{data}") }
-  end
- 
-  def handle_info(_info={_pid, :data, :err, data}, state) do
-    { :noreply, Map.put(state, :stderr_raw, "#{state.stderr_raw}\n#{data}") }
-  end
- 
-  def handle_info(_info={_pid, :result, result=%Result{status: status}}, state) do
-    { :noreply, Map.merge(state, %{status_raw: status, result: result}) }
   end
 end

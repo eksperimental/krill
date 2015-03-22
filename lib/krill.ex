@@ -56,11 +56,12 @@ defmodule Krill do
         Logger.debug "Running #{state.command_name}"
         Logger.debug "$ #{state.command}"
 
-        state = Krill.Process.run(state)
-        |> capture
-        |> process_std
-        |> put(:status, &Krill.Process.determine_status/1)
-        |> output
+        {:ok, state} = Krill.Process.run(state)
+        
+        :ok = capture(state)
+          |> process_std
+          |> put(:status, &Krill.Process.determine_status/1)
+          |> output
 
         Logger.debug "FINAL STATE [run]: #{inspect(state)}"
 
@@ -70,9 +71,9 @@ defmodule Krill do
       def output(state) do
         case state.status do
           0 ->
-            IO.puts state.message_ok
+            IO.puts( state.message_ok )
           _ ->
-            IO.puts state.message_error
+            IO.puts( :stderr, state.message_error )
         end
 
         unless empty? state.stdout  do
@@ -81,7 +82,7 @@ defmodule Krill do
         end
 
         unless empty? state.stderr do
-          Logger.debug "STDERR"
+          #Logger.debug "STDERR"
           IO.puts( :stderr, state.stderr )
         end
 
