@@ -27,14 +27,12 @@ defmodule Krill.Process do
     end
   end
 
-  def terminate(reason, _state) do
-    Logger.debug "Process Terminated. Reason: #{inspect reason}"
-    #Logger.debug "State: #{inspect(_state)}"
-    :ok
-  end
+  # def terminate(reason, _state) do
+  #   Logger.debug "Process Terminated. Reason: #{inspect reason}"
+  #   #Logger.debug "State: #{inspect(_state)}"
+  #   :ok
+  # end
 
-  #####
-  # Internal Functions
   def handle_output(sender, pid, state) do
     receive do
       { ^pid, :data, :out, data } ->
@@ -49,30 +47,7 @@ defmodule Krill.Process do
         state = Map.merge(state, %{status_raw: status, result: result})
         #IO.puts "State (handle_output): #{inspect(state)}"
         send sender, { :ok, state }
-    #after
-    #  :infinity -> IO.puts "timeout"
     end
-  end
-
-  def spawn_process(pid, state) do
-    opts = [ out: {:send, pid}, err: {:send, pid}, ]
-
-    unless is_nil(state.input),
-    do: opts = [input: state.input] ++ opts
-
-    process = Porcelain.spawn_shell(state.command, opts)
-    #{:ok, _result} = Porcelain.Process.await(process, timeout)
-    process
-  end
-
-  def do_process(pid, state) do
-    #opts = [ out: {:send, pid}, err: {:send, pid}, ]
-    opts = []
-
-    unless is_nil(state.input),
-    do: opts = [input: state.input] ++ opts
-
-    Porcelain.shell(state.command, opts)
   end
 
   def determine_status(state) do
@@ -90,18 +65,4 @@ defmodule Krill.Process do
     end
   end
 
-  def handle_output(pid, state, timeout \\ :infinity) do
-    receive do
-      {^pid, :data, :out, data} ->
-         handle_output( pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}\n#{data}"), timeout)
-
-      {^pid, :data, :err, data} ->
-        handle_output( pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}\n#{data}"), timeout)
-
-      {^pid, :result, result=%Result{status: status}} ->
-        Map.merge(state, %{status_raw: status, result: result})
-    after
-      timeout -> IO.puts( :stderr, "timeout" )
-    end
-  end
 end

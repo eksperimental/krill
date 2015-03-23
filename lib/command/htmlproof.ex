@@ -72,7 +72,7 @@ defmodule Command.Htmlproof do
   end
 
   # Improve OK/ERRROR messages  
-  defp capture(state) do
+  def capture(state) do
     # Grab total number of documents and errors
     destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, state.stdout_raw) )
     destructure( [_, total_external_links], Regex.run(~r/Checking (\d+) external links/, state.stdout_raw) )

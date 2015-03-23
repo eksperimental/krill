@@ -23,6 +23,17 @@ defmodule Krill.ParserTest do
     assert Parser.count_lines(text) == 15
   end
 
+  test "count lines" do
+    text = "1\n2\n3\n4"
+    assert Parser.count_lines(text) == 4
+  end
+
+  test "count lines trailing new line" do
+    text = "1\n2\n3\n4\n"
+    assert Parser.count_lines(text) == 4
+  end
+
+
   test "accept lines",  %{rules: rules, } do
     text = """
 1 - One

@@ -44,9 +44,10 @@ defmodule Command.HtmlproofTest do
   *  internal script toc.js does not exist (line 184)
 - something else
 """
+
     #Logger.debug inspect(text)
     #Logger.debug inspect(result)
-    assert Htmlproof.discard_favicons_on_redirects(text) == result
+    assert Htmlproof.discard_favicons_on_redirects( String.strip(text) ) == String.strip(result)
   end
 
 
@@ -74,6 +75,7 @@ defmodule Command.HtmlproofTest do
   *  no favicon specified
   *  internal script toc.js does not exist (line 184)
 """
-    assert Htmlproof.discard_files_no_errors(text) == result
+
+    assert Htmlproof.discard_files_no_errors( String.strip(text) ) == String.strip(result)
   end
 end
