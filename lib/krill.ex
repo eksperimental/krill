@@ -1,8 +1,11 @@
 defmodule Krill do
   use Behaviour
-  defcallback process_std(map) :: map
   defcallback new :: map
   defcallback config :: map
+  defcallback run :: tuple
+  defcallback capture :: map
+  defcallback process_std(map) :: map
+  defcallback output :: nil | :ok | :error
 
   defmacro __using__(_opts) do
     quote do
@@ -22,13 +25,14 @@ defmodule Krill do
           command_name: nil,
           message_ok: "OK: Everything is alright.",
           message_error: "ERROR: Errors have been found.",
-          accept: [stdout: nil, stderr: nil],
-          reject: [stdout: nil, stderr: nil],
+          accept: %{stdout: nil, stderr: nil},
+          reject: %{stdout: nil, stderr: nil},
 
           # non-configurable
           input: nil,
-          stdout: nil, stdout_raw: nil,
-          stderr: nil, stderr_raw: nil,
+          stdout: [], stdout_raw: [],
+          stderr: [], stderr_raw: [],
+          output: [],
           process: nil,
           result: nil,
           status: nil, status_raw: nil,
@@ -36,8 +40,8 @@ defmodule Krill do
       end
 
       def config(), do: %{}
-      def process_std(state), do: state
       def capture(state), do: state
+      def process_std(state), do: state
 
       def new(conf \\ nil) when is_nil(conf) when is_map(conf) do
         if is_nil(conf), do: conf = config()
@@ -76,21 +80,33 @@ defmodule Krill do
             IO.puts( :stderr, state.message_error )
         end
 
-        unless empty? state.stdout  do
-          Logger.debug "STDOUT"
-          IO.puts( state.stdout )
-        end
+        # unless empty? state.stdout  do
+        #   Logger.debug "STDOUT"
+        #   IO.puts( state.stdout )
+        # end
+        #
+        # unless empty? state.stderr do
+        #   #Logger.debug "STDERR"
+        #   IO.puts( :stderr, state.stderr )
+        # end
 
-        unless empty? state.stderr do
-          #Logger.debug "STDERR"
-          IO.puts( :stderr, state.stderr )
-        end
+        # Merge output
+        #Map.merge(state.stdout, state.stderr)
 
+        #Logger.debug "merge_output: " <> inspect(state)
+        merge_output(state.stdout, state.stderr)
         :ok
       end
 
       defoverridable [config: 0, start: 2, new: 0, process_std: 1, capture: 1, run: 0, ]
     end
+  end
+
+  # Temporary function, just to display message
+  # I NEED TO IMPORVE this.
+  def merge_output(stdout, stderr) do
+    inspect(stdout ++ stderr)
+    |> IO.puts
   end
 
   @doc "Put field, value pair into state"

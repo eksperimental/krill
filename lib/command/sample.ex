@@ -13,6 +13,7 @@ defmodule Command.Sample do
         ],
         stderr: [
           "foobar",
+          "line: 4",
         ]
       ],
     }

@@ -6,7 +6,7 @@ defmodule Krill.Process do
   Deals with anything related to Porcelain.Process and Results
   """
   
-  def run(state, timeout \\ :infinity) do
+  def run(state, _timeout \\ :infinity) do
     case state.process do
       nil ->
         Logger.debug("PID: #{inspect self}")
@@ -19,7 +19,7 @@ defmodule Krill.Process do
             state = state
         end
         state = Map.put(state, :process, process)
-        Logger.debug inspect(state)
+        #Logger.debug inspect(state)
         {:ok, state}
 
       _ ->
@@ -33,15 +33,19 @@ defmodule Krill.Process do
   #   :ok
   # end
 
-  def handle_output(sender, pid, state) do
+  def handle_output(sender, pid, state, counter \\ 1) do
     receive do
+      # state = %{a: 1, b: 2, stdout_raw: %{stdout: %{1 => "some string"}}}
+      # put_in(state, [:stdout_raw, :stdout, 2],  "ssss")
+
       { ^pid, :data, :out, data } ->
         #Logger.debug "OUT: #{inspect(data)}"
-        handle_output( sender, pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}#{data}") )
+        {_, state_updated} = get_and_update_in( state.stdout_raw, &({&1, &1 ++ [{counter, data}] }) )
+        handle_output( sender, pid, state_updated, counter+1)
 
       { ^pid, :data, :err, data } ->
-        #Logger.debug "ERR: #{inspect(data)}"
-        handle_output( sender, pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}#{data}") )
+        {_, state_updated} = get_and_update_in( state.stderr_raw, &({&1, &1 ++ [{counter, data}] }) )
+        handle_output( sender, pid, state_updated, counter+1)
 
       { ^pid, :result, result=%Result{status: status} } ->
         state = Map.merge(state, %{status_raw: status, result: result})

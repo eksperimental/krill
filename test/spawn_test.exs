@@ -26,7 +26,7 @@ defmodule Krill.SpawnTest do
   test "spawn" do
     state = %{foo: "bar"}
     pid = spawn(__MODULE__, :capitalize, [:foo])
-    IO.puts inspect(pid)
+    #Logger.debug inspect(pid)
 
     send pid, { self, {:hello, "world"} }  
     state = handle_output(state)

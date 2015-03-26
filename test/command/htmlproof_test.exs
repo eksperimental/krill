@@ -1,6 +1,7 @@
 defmodule Command.HtmlproofTest do
   use ExUnit.Case, async: true
   require Logger
+  alias Krill.Parser
   alias Command.Htmlproof
   doctest Command.Htmlproof
 
@@ -47,7 +48,15 @@ defmodule Command.HtmlproofTest do
 
     #Logger.debug inspect(text)
     #Logger.debug inspect(result)
-    assert Htmlproof.discard_favicons_on_redirects( String.strip(text) ) == String.strip(result)
+
+    lhs = String.strip(text, ?\n)
+      |> String.split("\n")
+      |> Parser.numerify
+      |> Htmlproof.discard_favicons_on_redirects
+      |> Parser.denumerify
+      |> Parser.join
+
+    assert lhs == String.strip(result)
   end
 
 
@@ -75,7 +84,9 @@ defmodule Command.HtmlproofTest do
   *  no favicon specified
   *  internal script toc.js does not exist (line 184)
 """
-
-    assert Htmlproof.discard_files_no_errors( String.strip(text) ) == String.strip(result)
-  end
+    lhs = text
+      |> String.strip(?\n)
+      |> Htmlproof.discard_files_no_errors
+   assert lhs == String.strip(result)
+ end
 end

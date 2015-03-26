@@ -31,54 +31,65 @@ defmodule Command.Htmlproof do
 
   def process_std(state) do
     #stdout
-    stdout = Parser.accept(state.stdout_raw, state.accept[:stdout])
+    stdout = state.stdout_raw
+      |> Parser.accept(state.accept[:stdout])
       |> Parser.reject(state.reject[:stdout])
+      |> Parser.reject_empty
 
     #stderr
-    stderr = Parser.accept(state.stderr_raw, state.accept[:stderr])
+    stderr = state.stderr_raw
+      |> Parser.accept(state.accept[:stderr])
       |> Parser.reject(state.reject[:stderr])
       |> discard_favicons_on_redirects
       |> discard_files_no_errors
+      |> Parser.reject_empty
 
     Map.merge(state, %{stdout: stdout, stderr: stderr})
   end
 
-  def discard_favicons_on_redirects(text) do
-    lines =  text |> String.split("\n")
-    
-    #Logger.debug "DEBUGGING: discard_favicons_on_redirects"
-    {result, _} = Enum.map_reduce(lines, "", fn(line, current_file)->
+  def discard_favicons_on_redirects(collection) do
+    {result, _} = Enum.map_reduce(collection, "", fn({line_no, line}, current_file)->
       cond do
-        Parser.match_rule?(~r/^- /, line) ->
+        Parser.match_rule?(line, ~r/^- /) ->
           current_file = line
 
         true ->
           # ignore favicon on redirect pages
-          if Parser.match_rule?("/getting_started/", current_file) and
-             Parser.match_rule?(~r/\s+\*\s+no favicon specified/, line) do
+          if Parser.match_rule?(current_file, "/getting_started/") and
+             Parser.match_rule?(line, ~r/\s+\*\s+no favicon specified/) do
             line = nil
           end       
       end
-      {line, current_file}
+      {{line_no, line}, current_file}
     end)
     #Logger.debug "#{inspect result}"
-    result |> Parser.join("\n")
+    result
   end
 
   # delete every file that has no errors
   # (ie, any file that is not followed by a line starting with "  *  ")
   def discard_files_no_errors(text) do
-    Regex.replace(~r/\- .*\n(?!\s+\*\s+)/, text, "")
+    replace = fn(text) -> Regex.replace(~r/\- .*\n(?!\s+\*\s+)/, text, "") end
+
+    if String.ends_with?(text, "\n") do
+      replace.(text <> "\n")
+    else
+      text = replace.(text <> "\n")
+      String.slice(text, 0, String.length(text)-1)
+    end
   end
 
   # Improve OK/ERRROR messages  
   def capture(state) do
-    # Grab total number of documents and errors
-    destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, state.stdout_raw) )
-    destructure( [_, total_external_links], Regex.run(~r/Checking (\d+) external links/, state.stdout_raw) )
+    stdout = Keyword.values(state.stdout_raw) |> Parser.join
+    stderr = Keyword.values(state.stderr_raw) |> Parser.join
 
-    total_errors = Parser.accept(state.stderr_raw, [~r/^\s+\*\s+/]) |> Parser.count_lines
-    error_files = Parser.accept(state.stderr_raw, [~r/^-\s+/]) |> Parser.count_lines
+    # Grab total number of documents and errors
+    destructure( [_, total_files], Regex.run(~r/Ran on (\d+) files!/, stdout ) )
+    destructure( [_, total_external_links], Regex.run(~r/Checking (\d+) external links/, stdout ) )
+
+    total_errors = Parser.accept(stderr, [~r/^\s+\*\s+/]) |> Parser.count_lines
+    error_files = Parser.accept(stderr, [~r/^-\s+/]) |> Parser.count_lines
     
     if total_files do
       message_ok = "OK: #{state.command_name} - #{total_files} documents have been validated."
