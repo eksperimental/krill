@@ -1,4 +1,5 @@
 defmodule Krill do
+  require Logger
   use Behaviour
   defcallback new() :: map
   defcallback config() :: map
@@ -57,8 +58,8 @@ defmodule Krill do
 
       def run() do
         state = new()
-        Logger.debug "Running #{state.command_name}"
-        Logger.debug "$ #{state.command}"
+        IO.puts "Running #{state.command_name}"
+        IO.puts "$ #{state.command}\n"
 
         {:ok, state} = Krill.Process.run(state)
         
@@ -74,6 +75,9 @@ defmodule Krill do
       end
 
       def output(state) do
+        # Merge output
+        merge_output(state.stdout, state.stderr)
+
         case state.status do
           0 ->
             IO.puts( state.message_ok )
@@ -81,8 +85,6 @@ defmodule Krill do
             IO.puts( :stderr, state.message_error )
         end
 
-        # Merge output
-        merge_output(state.stdout, state.stderr)
         :ok
       end
 
@@ -93,12 +95,45 @@ defmodule Krill do
   # Temporary function, just to display message
   # I NEED TO IMPORVE this.
   def merge_output(stdout, stderr) do
-    #IO.inspect(stdout ++ stderr)
-    IO.inspect(stdout)
-    IO.inspect(stderr)
+    #IO.inspect(stdout)
+    #IO.inspect(stderr)
 
-    #Enum.sort(Keyword.keys(stdout) ++ Keyword.keys(stderr))
-    #  |> Enum.map( &{&1, :err, :value} )
+    result = Enum.sort(Keyword.keys(stdout) ++ Keyword.keys(stderr)) |> 
+      Enum.map( fn(key)->
+
+        # return the value of collection[:key]
+        find = fn(collection, key) ->
+          Enum.find_value(
+            collection,
+            #fn({line_no, line}) when line_no == key -> line end
+            fn({line_no, line})-> if line_no == key, do: line end
+          )
+        end
+
+        #k = :"#{key}"
+        cond do
+          val = find.(stdout, key) ->
+            {key, :stdout, val}
+
+          val = find.(stderr, key) ->
+            {key, :stderr, val}
+
+          true ->
+            nil
+        end
+      end )
+
+    #Logger.debug("RESULT")
+    #IO.inspect(result)
+    Enum.each(result, fn({_line_no, type, line}) ->  
+      case type do
+        :stdout ->
+          IO.puts( line )
+
+        :stderr ->
+          IO.puts( :stderr, line)
+      end
+    end)
   end
 
   @doc "Put field, value pair into state"

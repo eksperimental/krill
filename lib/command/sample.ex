@@ -13,7 +13,7 @@ defmodule Command.Sample do
         ],
         stderr: [
           "foobar",
-          #"line: 4",
+          "line: 4",
         ]
       ],
     }
@@ -25,10 +25,10 @@ defmodule Command.Sample do
     stdout = Parser.reject(state.stdout_raw, state.reject[:stdout])
     stderr = Parser.reject(state.stderr_raw, state.reject[:stderr])
 
-    Logger.debug "STDOUT:"
-    IO.inspect(stdout)
-    Logger.debug "STDERR:"
-    IO.inspect(stderr)
+    #Logger.debug "STDOUT:"
+    #IO.inspect(stdout)
+    #Logger.debug "STDERR:"
+    #IO.inspect(stderr)
     Map.merge(state, %{stdout: stdout, stderr: stderr})
   end
   

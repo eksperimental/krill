@@ -8,7 +8,7 @@ defmodule Krill.Process do
   def run(state, _timeout \\ :infinity) do
     case state.process do
       nil ->
-        Logger.debug("PID: #{inspect self}")
+        #Logger.debug("PID: #{inspect self}")
         opts = [ out: {:send, self}, err: {:send, self}, ]
         %Porcelain.Process{pid: pid} = process = Porcelain.spawn_shell(state.command, opts)
         _state_handled = handle_output(self, pid, state)
@@ -24,28 +24,33 @@ defmodule Krill.Process do
     end
   end
 
-  # def terminate(reason, _state) do
-  #   Logger.debug "Process Terminated. Reason: #{inspect reason}"
-  #   #Logger.debug "State: #{inspect(_state)}"
-  #   :ok
-  # end
+
   def handle_output(sender, pid, state, counter \\ 1) do
     receive do
       { ^pid, :data, :out, data } ->
-        Logger.debug(data)
-        {_, state_updated} = get_and_update_in( state.stdout_raw, &({&1, &1 ++ [{counter, data}] }) )
-        handle_output( sender, pid, state_updated, counter+1)
+        #Logger.debug(data)
+        {data_lines, counter_updated} = get_multiline_data(data, counter)
+        {_, state_updated} = get_and_update_in( state.stdout_raw, &({&1, &1 ++ data_lines }) )
+        handle_output(sender, pid, state_updated, counter_updated)
 
       { ^pid, :data, :err, data } ->
-        Logger.debug(data)
-        {_, state_updated} = get_and_update_in( state.stderr_raw, &({&1, &1 ++ [{counter, data}] }) )
-        handle_output( sender, pid, state_updated, counter+1)
+        #Logger.debug(data)
+        {data_lines, counter_updated} = get_multiline_data(data, counter)
+        {_, state_updated} = get_and_update_in( state.stderr_raw, &({&1, &1 ++ data_lines }) )
+        handle_output( sender, pid, state_updated, counter_updated)
 
       { ^pid, :result, result=%Result{status: status} } ->
         state = Map.merge(state, %{status_raw: status, result: result})
         send sender, { :ok, state }
     end
   end
+
+  defp get_multiline_data(data, counter) do
+    Enum.map_reduce( String.split( String.rstrip(data, ?\n), "\n"), counter,
+      &{{&2, &1}, &2+1}
+    )
+  end
+
 
   def determine_status(state) do
     cond do
