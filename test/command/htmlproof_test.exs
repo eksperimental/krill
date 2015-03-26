@@ -49,8 +49,8 @@ defmodule Command.HtmlproofTest do
     #Logger.debug inspect(text)
     #Logger.debug inspect(result)
 
-    lhs = String.strip(text, ?\n)
-      |> String.split("\n")
+    lhs = text
+      |> Parser.split
       |> Parser.numerify
       |> Htmlproof.discard_favicons_on_redirects
       |> Parser.denumerify
@@ -85,8 +85,12 @@ defmodule Command.HtmlproofTest do
   *  internal script toc.js does not exist (line 184)
 """
     lhs = text
-      |> String.strip(?\n)
+      |> Parser.split
+      |> Parser.numerify
       |> Htmlproof.discard_files_no_errors
+      |> Parser.denumerify
+      |> Parser.join
+      
    assert lhs == String.strip(result)
  end
 end

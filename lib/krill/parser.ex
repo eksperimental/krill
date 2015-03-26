@@ -6,12 +6,12 @@ defmodule Krill.Parser do
   Match `string` against and every rule in `rules`.
   Returns `true` if any of them matched, or `false` if none. 
   """
-
   def match_rule?(string, rules) when is_bitstring(string) and is_list(rules) do
     Enum.find_value(rules, false,
       fn(rule) -> match_rule?(string, rule)
     end)
   end
+
 
   @doc """
   Matches `rule` against `string`.
@@ -36,11 +36,13 @@ defmodule Krill.Parser do
     end
   end
 
+
   @doc """
   Returns the numer of lines in `string`.
   """
   def count_lines(string),
   do: String.split(string, "\n") |> Enum.count
+
 
   @doc """
   Returns the number of lines in `string` for which `fun` returns a truthy value.
@@ -49,6 +51,7 @@ defmodule Krill.Parser do
     String.split(string, "\n")
     |> Enum.count(string, fun)
   end
+
   
   @doc """
   Returns the number of lines in `string` that match `fun` returns a truthy value.
@@ -58,14 +61,12 @@ defmodule Krill.Parser do
       Enum.count(string, &(&1 =~ pattern))
   end
 
+
   @doc """
   Rejects items in `collection` that are empty strings, `nil`  or
   `false`.
   """
   def reject_empty(collection) when is_list(collection) do
-    #Enum.reject( collection, &( empty?(&1) ) )
-    #Enum.reject( collection, fn({_line_no, line}) -> empty?(line) end )
-
     Enum.reject( collection, fn
       {_line_no, line} ->
         empty?(line)
@@ -74,6 +75,7 @@ defmodule Krill.Parser do
     end)
 
   end
+
 
   @doc """
   Joins a `collection` with `joiner`, removing items that are empty
@@ -84,10 +86,15 @@ defmodule Krill.Parser do
   """
   def join(collection, joiner \\ "\n") do
     collection
-    |> reject_empty
-    |> Enum.join(joiner)
+      |> reject_empty
+      |> Enum.join(joiner)
   end
 
+  def split(string, delimiter \\ "\n") do
+    string
+      |> String.strip(?\n)
+      |> String.split(delimiter)
+  end
 
 
   ####################
@@ -101,7 +108,6 @@ defmodule Krill.Parser do
   
   `rules` must be a list of rules consiting of `string`s or `regex`es.
   """
-
   @spec accept( nil | list | String.t, nil | list ) :: map | String.t
   def accept(nil, _rules), do: nil
 
@@ -142,11 +148,6 @@ defmodule Krill.Parser do
     Enum.reject( collection, fn({_line_no, line}) ->
       match_rule?(line, rules)
     end)
-    # Enum.reject( collection, fn({_line_no, line}) ->
-    #   Enum.find_value( rules, fn(rule) ->
-    #     match_rule?(rule, line)
-    #   end)
-    # end)
   end
 
   def reject(string, rules) when is_bitstring(string) and is_list(rules) do
@@ -168,7 +169,6 @@ defmodule Krill.Parser do
   Takes a `list` with lines in the format [{line_no, line}, ...], and return a list
   containing the lines only [line_1, line_2, ...]
   """
-
   def denumerify(list) when is_list(list)  do
     Enum.map(list, fn({_line_no, line}) -> line end)
   end

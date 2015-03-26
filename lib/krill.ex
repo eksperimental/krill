@@ -1,11 +1,11 @@
 defmodule Krill do
   use Behaviour
-  defcallback new :: map
-  defcallback config :: map
-  defcallback run :: tuple
-  defcallback capture :: map
+  defcallback new() :: map
+  defcallback config() :: map
+  defcallback run() :: tuple
+  defcallback capture(map) :: map
   defcallback process_std(map) :: map
-  defcallback output :: nil | :ok | :error
+  defcallback output(map) :: nil | :ok | :error
 
   defmacro __using__(_opts) do
     quote do
@@ -62,13 +62,14 @@ defmodule Krill do
 
         {:ok, state} = Krill.Process.run(state)
         
-        :ok = capture(state)
+        :ok = state
+          |> capture()
           |> process_std
           |> put(:status, &Krill.Process.determine_status/1)
           |> output
 
-        Logger.debug "FINAL STATE [run]: #{inspect(state)}"
-
+        #Logger.debug "FINAL STATE [run]: #{inspect(state)}"
+        #IO.inspect(state)
         {:ok, state}
       end
 
@@ -80,20 +81,7 @@ defmodule Krill do
             IO.puts( :stderr, state.message_error )
         end
 
-        # unless empty? state.stdout  do
-        #   Logger.debug "STDOUT"
-        #   IO.puts( state.stdout )
-        # end
-        #
-        # unless empty? state.stderr do
-        #   #Logger.debug "STDERR"
-        #   IO.puts( :stderr, state.stderr )
-        # end
-
         # Merge output
-        #Map.merge(state.stdout, state.stderr)
-
-        #Logger.debug "merge_output: " <> inspect(state)
         merge_output(state.stdout, state.stderr)
         :ok
       end
@@ -105,8 +93,12 @@ defmodule Krill do
   # Temporary function, just to display message
   # I NEED TO IMPORVE this.
   def merge_output(stdout, stderr) do
-    inspect(stdout ++ stderr)
-    |> IO.puts
+    #IO.inspect(stdout ++ stderr)
+    IO.inspect(stdout)
+    IO.inspect(stderr)
+
+    #Enum.sort(Keyword.keys(stdout) ++ Keyword.keys(stderr))
+    #  |> Enum.map( &{&1, :err, :value} )
   end
 
   @doc "Put field, value pair into state"

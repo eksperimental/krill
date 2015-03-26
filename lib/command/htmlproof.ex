@@ -7,7 +7,7 @@ defmodule Command.Htmlproof do
       name: {:global, __MODULE__},
       command_name: command_name,
       #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
-      command: "htmlproof ~/git/eksperimental/krill/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
+      command: "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
       reject: [
         stdout: [
           ~r/Running \[.*\] checks on/,
@@ -68,15 +68,34 @@ defmodule Command.Htmlproof do
 
   # delete every file that has no errors
   # (ie, any file that is not followed by a line starting with "  *  ")
-  def discard_files_no_errors(text) do
-    replace = fn(text) -> Regex.replace(~r/\- .*\n(?!\s+\*\s+)/, text, "") end
+  def discard_files_no_errors(collection) do
+    # add extra file element, so it can check if the last file needs to be removed.
+    {result, {last_match, last_line_no, reject_lines}} = 
+      Enum.map_reduce(collection, {nil, nil, []}, fn({line_no, line}, {last_match, last_line_no, reject_lines})->
+      cond do
+        Parser.match_rule?(line, ~r/^- /) ->
+          if last_match == :file do
+            reject_lines = [last_line_no] ++ reject_lines
+          end
+          last_match = :file
 
-    if String.ends_with?(text, "\n") do
-      replace.(text <> "\n")
-    else
-      text = replace.(text <> "\n")
-      String.slice(text, 0, String.length(text)-1)
+        Parser.match_rule?(line, ~r/^\s+\*\s+/) ->
+          last_match = :error
+
+        true ->
+          nil
+      end
+      { {line_no, line}, {last_match, line_no, reject_lines} }
+    end)
+
+    # check if last_match was a :file, if so, add line_no to reject_lines
+    if last_match == :file do
+      reject_lines = [last_line_no] ++ reject_lines
     end
+    
+    #Logger.debug "REJECT LINES: #{inspect reject_lines}"
+    #Logger.debug "RESULT: #{inspect(result)}"
+    Enum.reject(result, fn({line_no, _line})-> Enum.member?(reject_lines, line_no) end  )
   end
 
   # Improve OK/ERRROR messages  
