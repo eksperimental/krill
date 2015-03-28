@@ -74,7 +74,7 @@ defmodule Krill do
         {:ok, state}
       end
 
-      def output(state) do
+      def output(state) when is_map(state) do
         # Merge output
         merge_output(state.stdout, state.stderr)
 
@@ -92,25 +92,17 @@ defmodule Krill do
     end
   end
 
-  # Temporary function, just to display message
-  # I NEED TO IMPORVE this.
-  def merge_output(stdout, stderr) do
-    #IO.inspect(stdout)
-    #IO.inspect(stderr)
+  def merge_output(stdout, stderr) when is_list(stdout) and is_list(stderr) do
+    # return the value of collection[:key]
+    find = fn(collection, key) ->
+      Enum.find_value(
+        collection,
+        fn({line_no, line})-> if line_no == key, do: line end
+      )
+    end
 
-    result = Enum.sort(Keyword.keys(stdout) ++ Keyword.keys(stderr)) |> 
-      Enum.map( fn(key)->
-
-        # return the value of collection[:key]
-        find = fn(collection, key) ->
-          Enum.find_value(
-            collection,
-            #fn({line_no, line}) when line_no == key -> line end
-            fn({line_no, line})-> if line_no == key, do: line end
-          )
-        end
-
-        #k = :"#{key}"
+    Enum.sort(Keyword.keys(stdout) ++ Keyword.keys(stderr))
+      |> Enum.map( fn(key)->
         cond do
           val = find.(stdout, key) ->
             {key, :stdout, val}
@@ -122,17 +114,14 @@ defmodule Krill do
             nil
         end
       end )
+      |> Enum.each(fn({_line_no, type, line}) ->  
+        case type do
+          :stdout ->
+            IO.puts( line )
 
-    #Logger.debug("RESULT")
-    #IO.inspect(result)
-    Enum.each(result, fn({_line_no, type, line}) ->  
-      case type do
-        :stdout ->
-          IO.puts( line )
-
-        :stderr ->
-          IO.puts( :stderr, line)
-      end
+          :stderr ->
+            IO.puts( :stderr, line)
+        end
     end)
   end
 
