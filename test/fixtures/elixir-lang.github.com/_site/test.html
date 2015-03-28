@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>Elixir</title>
+  <link href="http://feeds.feedburner.com/ElixirLang" rel="alternate" title="Elixir's Blog" type="application/atom+xml" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/js/icons/style.css">
+  <!--[if lt IE 8]><!-->
+  <link rel="stylesheet" href="/js/icons/ie7/ie7.css">
+  <!--<![endif]-->
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" id="font-bitter-css" href="http://fonts.googleapis.com/css?family=Bitter&amp;ver=1" type="text/css" media="screen" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+</head>
+
+<body class="">
+  <div id="container">
+    <div class="wrap">
+    <div id="header">
+      <div id="branding">
+        <h1 id="site-title">
+          <a href="/" title="Elixir" rel="Home">
+            <img class="logo" src="/images/logo/logo.png" alt="Elixir Logo" />
+          </a>
+        </h1>
+      </div>
+
+      <div id="menu-primary" class="menu-container">
+        <div class="menu">
+          <ul id="menu-primary-items">
+            <li class="menu-item home"><a class="spec" href="/">Home</a></li>
+            <li class="menu-item install"><a class="spec" href="/install.html">Install</a></li>
+            <li class="menu-item getting-started"><a class="spec" href="/getting-started/introduction.html">Getting Started</a></li>
+            <li class="menu-item learning"><a class="spec" href="/learning.html">Learning</a></li>
+            <li class="menu-item docs"><a class="spec" href="/docs.html">Docs</a></li>
+            <li class="menu-item blog"><a class="spec" href="/blog/">Blog</a></li>
+            <li class="menu-item packages"><a class="spec" href="http://hex.pm/">Packages</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+    </div>
+
+    <div id="main">
+
+
+<div id="content">
+  <h1 id="jekyll-table-of-contents">jekyll-table-of-contents</h1>
+
+<p>A simple JavaScript table of contents generator. Works well with <a href="https://github.com/mojombo/jekyll">jekyll</a> static sites.</p>
+
+<div id="toc"></div>
+
+<h2 id="single-&#39;quoted&#39;">Single &#39;quoted&#39;</h2>
+
+<h2 id="double-&quot;quoted&quot;">Double &quot;quoted&quot;</h2>
+
+<h2 id="brackets-(parenthesis),-[brackets]-and-{braces}">Brackets (parenthesis), [brackets] and {braces}</h2>
+
+<h3 id="basic-usage">Basic Usage</h3>
+
+<p>The script requires jQuery. First, reference <code>toc.js</code> in templates where you would like to add the table of content.
+Then, create an HTML element wherever you want your table of contents to appear:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;toc&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</code></pre></div>
+<p>Finally, call the <code>.toc()</code> function when the DOM is ready:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div>
+<p>If you use redcarpet, you need to have the option <code>with_toc_data</code> in order to add HTML anchors to each header:
+<code>yaml
+markdown: redcarpet
+redcarpet:
+    extensions: [with_toc_data]
+</code></p>
+
+<p>If you use rdiscount, enable the following option in order to generate the TOC:
+<code>yaml
+markdown: rdiscount
+rdiscount:
+    extensions:
+      - generate_toc
+</code></p>
+
+<h3 id="single&#39;s-quote&#39;s">Single&#39;s Quote&#39;s</h3>
+
+<p>Headings with single quotes</p>
+
+<h3 id="this-one-is-&quot;double-quoted&quot;">This one is &quot;Double Quoted&quot;</h3>
+
+<p>Headings with double quotes</p>
+
+<h3 id="this-one-is-(parenthesis)">This one is (Parenthesis)</h3>
+
+<p>Headings with parenthesis</p>
+
+<h3 id="all-sort-of-[brackets]-and-{braces}">All sort of [brackets] and {braces}</h3>
+
+<p>Yes</p>
+
+<h3 id="how-it-works">How It Works</h3>
+
+<p>The script works by looking for headers (h1, h2, h3, h4, h5, h6) which have an <code>id</code>.
+An id is added automatically if you&#39;re using Jekyll and <a href="http://daringfireball.net/projects/markdown/syntax#header">Markdown</a>.</p>
+
+<p>The table of contents automatically handles nesting of headers. For example, this Markdown post:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">## Title
+## Page 1
+### Note on Paragraph 3
+## Page 2
+### Note on Paragraph 2
+### Note on Paragraph 4
+</code></pre></div>
+<p>Will render this table of contents:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">1. Title
+2. Page 1
+  a. Note on Paragraph 3
+3. Page 2
+  a. Note on Paragraph 2
+  b. Note on Paragraph 4
+</code></pre></div>
+<h3 id="configuration">Configuration</h3>
+
+<h4 id="list-type">List Type</h4>
+
+<p>By default the table of contents is rendered as an <code>&lt;ol&gt;</code>, so you can change the number formatting using CSS.
+However you can use the <code>&lt;ul&gt;</code> tag, using the <code>listType</code> option:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">listType</span><span class="o">:</span> <span class="s1">&#39;ul&#39;</span> <span class="p">});</span>
+</code></pre></div>
+<h4 id="header-styling">Header Styling</h4>
+
+<p>The script also adds an <code>&lt;i&gt;</code> tag next to each header. This uses the class <code>icon-arrow-up</code>, which if you&#39;re using <a href="http://twitter.github.io/bootstrap/">Bootstrap</a>, will be an arrow pointing to the top of the page.
+Clicking that arrow will scroll you to the top, while clicking on a header will get a permanent link to that particular header (using <code>window.location.hash</code>).</p>
+
+<p>If you don&#39;t want this feature, add this setting:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">noBackToTopLinks</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
+</code></pre></div>
+<p>Otherwise, you can use the stylesheet below to have the icon and the header aligned nicely:</p>
+<div class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.clickable-header</span> <span class="p">{</span>
+  <span class="k">cursor</span><span class="o">:</span><span class="k">pointer</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nc">.clickable-header</span><span class="nd">:hover</span> <span class="p">{</span>
+  <span class="k">text-decoration</span><span class="o">:</span><span class="k">underline</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nc">.top-level-header</span> <span class="p">{</span>
+  <span class="k">display</span><span class="o">:</span><span class="k">inline</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nc">.back-to-top</span> <span class="p">{</span>
+  <span class="k">margin-left</span><span class="o">:</span><span class="m">5px</span><span class="p">;</span>
+  <span class="k">cursor</span><span class="o">:</span><span class="k">pointer</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="headers-used">Headers Used</h4>
+
+<p>By default the table of content is displayed when at least 3 headers are found. 
+You can customize the minimum number of headers required with this setting:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">minimumHeaders</span><span class="o">:</span> <span class="mi">2</span> <span class="p">});</span>
+</code></pre></div>
+<p>And you can also select which headers you want to link to. By default <code>h1, h2, h3, h4, h5, h6</code> are displayed, but changing the <code>headers</code> setting lets you tweak it:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">headers</span><span class="o">:</span> <span class="s1">&#39;h3, h4, h5, h6&#39;</span> <span class="p">});</span>
+<span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">headers</span><span class="o">:</span> <span class="s1">&#39;.content h1, .content h2, .content h3, .content h4, .content h5, .content h6&#39;</span> <span class="p">});</span>
+</code></pre></div>
+<h4 id="effects">Effects</h4>
+
+<p>Finally, you can also change the way the toc is displayed, choosing a <code>slideShow</code> or a <code>fadeIn</code> effect instead of <code>show</code>:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">showEffect</span><span class="o">:</span> <span class="s1">&#39;slideDown&#39;</span> <span class="p">});</span>
+</code></pre></div>
+<p>Otherwise, to deactivate the effect, set it up like this:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">showSpeed</span><span class="o">:</span> <span class="mi">0</span> <span class="p">});</span>
+</code></pre></div>
+<h2 id="copyright">Copyright</h2>
+
+<p>See LICENSE.txt for further details. But basically, do what you like with this.</p>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+<script src="toc.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#toc').toc({
+  title: '',
+  listType: 'ol',
+  minimumHeaders: 2,
+  headers: 'h2, h3, h4, h5, h6',
+  });
+});
+</script>  
+
+</div><!-- #content -->
+
+<div id="sidebar-primary" class="sidebar">
+  <div class="widget news">
+  <h3>
+    News: <a href="/blog/2014/09/18/elixir-v1-0-0-released/">Elixir v1.0 released</a>
+  </h3>
+</div>
+
+<div class="widget search">
+  <form method="get" class="search-form" action="http://www.google.com/search">
+		<div>
+			<input class="search-text" type="text" name="q" placeholder="Search..." id="searchfield">
+			<input type="hidden" name="sitesearch" value="elixir-lang.org">
+			<input class="search-submit button" name="submit" type="submit" value="Search">
+		</div>
+	</form>
+</div>
+  <div class="widget">
+  <h3 class="widget-title">Join the Community</h3>
+  <ul>
+    <li><a class="spec" href="irc://irc.freenode.net/elixir-lang">#elixir-lang on freenode IRC</a></li>
+    <li><a class="spec" href="http://groups.google.com/group/elixir-lang-talk">elixir-talk mailing list (questions)</a></li>
+    <li><a class="spec" href="http://groups.google.com/group/elixir-lang-core">elixir-core mailing list (development)</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir/issues">Issue tracker</a></li>
+    <li><a class="spec" href="http://twitter.com/elixirlang">@elixirlang on Twitter</a></li>
+  </ul>
+</div>
+
+<div class="widget">
+  <h3 class="widget-title">Important links</h3>
+  <ul>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir">Source Code</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir/wiki">Wiki with events, resources and talks organized by the community</a></li>
+    <li><a class="spec" href="/crash-course.html">Crash course for Erlang developers</a></li>
+  </ul>
+</div>
+
+  <div class="widget">
+  <h3 class="widget-title">Code editor support</h3>
+  <ul>
+    <li><a class="spec" href="https://github.com/elixir-lang/emacs-elixir">Emacs Mode</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir-tmbundle">Textmate Bundle</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/vim-elixir">Vim Elixir</a></li>
+    <li><a class="spec" href="https://github.com/SteffenBauer/elixir-gtksourceview">GtkSourceView (gedit)</a></li>
+    <li><a class="spec" href="https://github.com/lucasmazza/language-elixir">Atom Package</a></li>
+  </ul>
+</div>
+
+  <div id="sponsors" class="widget">
+  <h3 class="widget-title">Sponsors</h3>
+  <ul>
+    <li class="image"><a href="http://plataformatec.com.br" title="Plataformatec"><img src="/images/logo/plataformatec.png" alt="Plataformatec Logo" width="190" height="74" /></a></li>
+  </ul>
+</div>
+</div>
+
+      </div><!-- #main -->
+
+      <div class="clear"></div>
+
+      <div id="copyright">
+        &copy; 2012-2015 <a href="http://plataformatec.com.br/">Plataformatec</a>. All rights reserved.
+      </div>
+    </div><!-- .wrap -->
+  </div><!-- #container -->
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8268430-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/js/toc/toc.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.toc').toc({
+        title: '',
+        listType: 'ol',
+        minimumHeaders: 2,
+        headers: 'h2, h3, h4, h5, h6',
+        linkHere: true,
+        linkHereTitle: 'Link here',
+        backToTop: true,
+        backToTopId: 'toc',
+        backToTopTitle: 'Back to Table of Contents',
+      });
+      $('.jekyll-toc-header a.jekyll-toc-link-here span.jekyll-toc-icon').addClass('icon icon-link');
+      $('.jekyll-toc-header a.jekyll-toc-back-to-top span.jekyll-toc-icon').addClass('icon icon-chevron-up');
+    });
+
+  </script>
+</body>
+</html>

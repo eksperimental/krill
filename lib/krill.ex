@@ -63,11 +63,12 @@ defmodule Krill do
 
         {:ok, state} = Krill.Process.run(state)
         
-        :ok = state
+        state = state
           |> capture()
           |> process_std
           |> put(:status, &Krill.Process.determine_status/1)
-          |> output
+
+        output(state)
 
         #Logger.debug "FINAL STATE [run]: #{inspect(state)}"
         #IO.inspect(state)
@@ -75,8 +76,7 @@ defmodule Krill do
       end
 
       def output(state) when is_map(state) do
-        # Merge output
-        merge_output(state.stdout, state.stderr)
+        print_output( merge_output(state.stdout, state.stderr) )
 
         case state.status do
           0 ->
@@ -114,7 +114,12 @@ defmodule Krill do
             nil
         end
       end )
-      |> Enum.each(fn({_line_no, type, line}) ->  
+  end
+
+  def print_output(merged_output) do
+    # Merge output
+    Enum.each( merged_output,
+      fn({_line_no, type, line}) ->  
         case type do
           :stdout ->
             IO.puts( line )
@@ -122,7 +127,7 @@ defmodule Krill do
           :stderr ->
             IO.puts( :stderr, line)
         end
-    end)
+      end)
   end
 
   @doc "Put field, value pair into state"

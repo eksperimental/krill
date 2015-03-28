@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <h1 id="jekyll-table-of-contents">jekyll-table-of-contents</h1>
+
+    <p>A simple JavaScript table of contents generator. Works well with <a href="https://github.com/mojombo/jekyll">jekyll</a> static sites.</p>
+
+    <div id="toc"></div>
+
+    <h2 id="usage">Usage</h2>
+
+    <h3 id="basic-usage">Basic Usage</h3>
+
+    <p>The script requires jQuery. First, reference <code>toc.js</code> in templates where you would like to add the table of content.
+    Then, create an HTML element wherever you want your table of contents to appear:</p>
+    <div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;toc&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+    </code></pre></div>
+    <p>Finally, call the <code>.toc()</code> function when the DOM is ready:</p>
+    <div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">();</span>
+    <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+    </code></pre></div>
+    <p>If you use redcarpet, you need to have the option <code>with_toc_data</code> in order to add HTML anchors to each header:
+    <code>yaml
+    markdown: redcarpet
+    redcarpet:
+        extensions: [with_toc_data]
+    </code></p>
+
+    <p>If you use rdiscount, enable the following option in order to generate the TOC:
+    <code>yaml
+    markdown: rdiscount
+    rdiscount:
+        extensions:
+          - generate_toc
+    </code></p>
+
+    <h3 id="how-it-works">How It Works</h3>
+
+    <p>The script works by looking for headers (h1, h2, h3, h4, h5, h6) which have an <code>id</code>.
+    An id is added automatically if you&#39;re using Jekyll and <a href="http://daringfireball.net/projects/markdown/syntax#header">Markdown</a>.</p>
+
+    <p>The table of contents automatically handles nesting of headers. For example, this Markdown post:</p>
+    <div class="highlight"><pre><code class="language-text" data-lang="text">## Title
+    ## Page 1
+    ### Note on Paragraph 3
+    ## Page 2
+    ### Note on Paragraph 2
+    ### Note on Paragraph 4
+    </code></pre></div>
+    <p>Will render this table of contents:</p>
+    <div class="highlight"><pre><code class="language-text" data-lang="text">1. Title
+    2. Page 1
+      a. Note on Paragraph 3
+    3. Page 2
+      a. Note on Paragraph 2
+      b. Note on Paragraph 4
+    </code></pre></div>
+    <h3 id="configuration">Configuration</h3>
+
+    <h4 id="list-type">List Type</h4>
+
+    <p>By default the table of contents is rendered as an <code>&lt;ol&gt;</code>, so you can change the number formatting using CSS.
+    However you can use the <code>&lt;ul&gt;</code> tag, using the <code>listType</code> option:</p>
+    <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">listType</span><span class="o">:</span> <span class="s1">&#39;ul&#39;</span> <span class="p">});</span>
+    </code></pre></div>
+    <h4 id="header-styling">Header Styling</h4>
+
+    <p>The script also adds an <code>&lt;i&gt;</code> tag next to each header. This uses the class <code>icon-arrow-up</code>, which if you&#39;re using <a href="http://twitter.github.io/bootstrap/">Bootstrap</a>, will be an arrow pointing to the top of the page.
+    Clicking that arrow will scroll you to the top, while clicking on a header will get a permanent link to that particular header (using <code>window.location.hash</code>).</p>
+
+    <p>If you don&#39;t want this feature, add this setting:</p>
+    <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">noBackToTopLinks</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
+    </code></pre></div>
+    <p>Otherwise, you can use the stylesheet below to have the icon and the header aligned nicely:</p>
+    <div class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.clickable-header</span> <span class="p">{</span>
+      <span class="k">cursor</span><span class="o">:</span><span class="k">pointer</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nc">.clickable-header</span><span class="nd">:hover</span> <span class="p">{</span>
+      <span class="k">text-decoration</span><span class="o">:</span><span class="k">underline</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nc">.top-level-header</span> <span class="p">{</span>
+      <span class="k">display</span><span class="o">:</span><span class="k">inline</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nc">.back-to-top</span> <span class="p">{</span>
+      <span class="k">margin-left</span><span class="o">:</span><span class="m">5px</span><span class="p">;</span>
+      <span class="k">cursor</span><span class="o">:</span><span class="k">pointer</span><span class="p">;</span>
+    <span class="p">}</span>
+    </code></pre></div>
+    <h4 id="headers-used">Headers Used</h4>
+
+    <p>By default the table of content is displayed when at least 3 headers are found. 
+    You can customize the minimum number of headers required with this setting:</p>
+    <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">minimumHeaders</span><span class="o">:</span> <span class="mi">2</span> <span class="p">});</span>
+    </code></pre></div>
+    <p>And you can also select which headers you want to link to. By default <code>h1, h2, h3, h4, h5, h6</code> are displayed, but changing the <code>headers</code> setting lets you tweak it:</p>
+    <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">headers</span><span class="o">:</span> <span class="s1">&#39;h3, h4, h5, h6&#39;</span> <span class="p">});</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">headers</span><span class="o">:</span> <span class="s1">&#39;.content h1, .content h2, .content h3, .content h4, .content h5, .content h6&#39;</span> <span class="p">});</span>
+    </code></pre></div>
+    <h4 id="effects">Effects</h4>
+
+    <p>Finally, you can also change the way the toc is displayed, choosing a <code>slideShow</code> or a <code>fadeIn</code> effect instead of <code>show</code>:</p>
+    <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">showEffect</span><span class="o">:</span> <span class="s1">&#39;slideDown&#39;</span> <span class="p">});</span>
+    </code></pre></div>
+    <p>Otherwise, to deactivate the effect, set it up like this:</p>
+    <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#toc&#39;</span><span class="p">).</span><span class="nx">toc</span><span class="p">({</span> <span class="nx">showSpeed</span><span class="o">:</span> <span class="mi">0</span> <span class="p">});</span>
+    </code></pre></div>
+    <h2 id="copyright">Copyright</h2>
+
+    <p>See LICENSE.txt for further details. But basically, do what you like with this.</p>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+    <script src="toc.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $('#toc').toc({
+      title: '',
+      listType: 'ol',
+      minimumHeaders: 2,
+      headers: 'h2, h3, h4, h5, h6',
+      });
+    });
+    </script>  
+  </body>
+</html>

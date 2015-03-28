@@ -7,7 +7,7 @@ defmodule Command.Htmlproof do
       name: {:global, __MODULE__},
       command_name: command_name,
       #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
-      command: "htmlproof ./_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
+      command: "htmlproof ./test/fixtures/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
       reject: [
         stdout: [
           ~r/Running \[.*\] checks on/,
@@ -24,8 +24,8 @@ defmodule Command.Htmlproof do
           ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
         ]
       ],
-      message_ok: "OK: #{command_name} - Documents have been validated.",
-      message_ok: "ERROR: #{command_name} - Documents did not validate.",
+      message_ok: "OK: #{command_name} - Everything is alright.",
+      message_error: "ERROR: #{command_name} - Documents did not validate.",
     }
   end
 

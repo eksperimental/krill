@@ -22,8 +22,15 @@ defmodule Mix.Tasks.Krill.Execute do
 
   @doc false
   def run(module_names) do
-    if module_names == [] do
-      module_names = Application.get_env(:krill, :commands)
+    case module_names do
+      [] ->
+        module_names = Application.get_env(:krill, :commands)
+
+      [":all"] ->
+        module_names = list_commands()
+
+      _ ->
+        nil
     end
 
     cond do
@@ -31,8 +38,15 @@ defmodule Mix.Tasks.Krill.Execute do
         Mix.Task.run "app.start"
         modules = Enum.map(module_names, &(Module.concat([Command, String.capitalize(&1)])))
         
-        start_jobs(modules, :run)
-        collect_responses(length(modules))
+        #start_jobs(modules, :run)
+        #collect_responses(length(modules))
+
+        Enum.map(modules, fn(module) ->
+          Task.async(module, :run, [])
+        end)
+        |> Enum.each(fn(task) ->
+          Task.await(task, :infinity)
+        end)
 
       true ->
         exit({:shotdown, "No module_names provided"})

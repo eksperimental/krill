@@ -7,16 +7,13 @@ defmodule Krill.ProcessTest do
   setup do
     conf = %{ 
       command_name: "Testing Command",
-      command: "./test/command/process.sh",
-      #command: "htmlproof ~/git/eksperimental/krill/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
-      #command: "htmlproof  ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
-      #command: "htmlproof  ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
+      command: "./test/fixtures/echo.sh",
     }
 
-    out = "this is ok (line: 1)\nthis is ok 2 (line: 3)\nthis is ok 3 (line: 6)\n"
-    err = "this is is error (line: 2)\nthis is is error2 (line: 4)\nthis is is error3 (line: 5)\n"
+    expected_out = "(line: 1) OK stdout\n(line: 3) OK stdout\n(line: 8) OK stdout\n(line: 13) OK stdout\n(line: 14) OK stdout\n(line: 15) OK stdout\n(line: 16) OK stdout\n(line: 17) OK stdout\n(line: 18) OK stdout\n(line: 20) OK stdout\n"
+    expected_err = "(line: 2) ERR stderr\n(line: 4) ERR stderr\n(line: 5) ERR stderr\n(line: 6) ERR stderr\n(line: 7) ERR stderr\n(line: 9) ERR stderr\n(line: 10) ERR stderr\n(line: 11) ERR stderr\n(line: 12) ERR stderr\n(line: 19) ERR stderr\n"
 
-    {:ok, state: new(conf), err: err, out: out, }
+    {:ok, state: new(conf), expected_out: expected_out, expected_err: expected_err, }
   end
 
   def exec(sender_pid, command, mode \\ :spawn_shell) do
@@ -52,7 +49,7 @@ defmodule Krill.ProcessTest do
     end
   end
 
-  test "spawn_shell", %{state: state, out: out, err: err} do
+  test "spawn_shell", %{state: state, expected_out: expected_out, expected_err: expected_err, } do
     #Logger.debug("PID: #{inspect self}")
     #process = Porcelain.spawn_shell(state.command, [out: {:send, self}, err: {:send, self}])
     {:ok, process} = exec(self, state.command, :spawn_shell)
@@ -71,11 +68,11 @@ defmodule Krill.ProcessTest do
     #Logger.debug("result: #{inspect state.result}")
 
     state = Map.put(state, :process, process)
-    assert state.stdout_raw == out
-    assert state.stderr_raw == err
+    assert state.stdout_raw == expected_out
+    assert state.stderr_raw == expected_err
   end
 
-  test "shell", %{state: state, out: out, err: err} do
+  test "shell", %{state: state,  expected_out: expected_out, expected_err: expected_err, } do
     #Logger.debug("PID: #{inspect self}")
 
     #state = Krill.Process.run(state)
@@ -89,8 +86,8 @@ defmodule Krill.ProcessTest do
       status_raw: result.status,
     })
     #Logger.debug inspect( Map.delete(state, :result) )
-    assert state.stdout_raw == out
-    assert state.stderr_raw == err
+    assert state.stdout_raw == expected_out
+    assert state.stderr_raw == expected_err
   end
 
 
