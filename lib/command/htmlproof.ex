@@ -22,6 +22,9 @@ defmodule Command.Htmlproof do
           # Remote errors, when /docs/ doesn't exist
           ~r/internally linking to \/docs\/.*, which does not exist/,
           ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
+
+          "internal script toc.js",
+          "no favicon specified",
         ]
       ],
       message_ok: "OK: #{command_name} - Everything is alright.",
@@ -34,6 +37,7 @@ defmodule Command.Htmlproof do
     stdout = state.stdout_raw
       |> Parser.accept(state.accept[:stdout])
       |> Parser.reject(state.reject[:stdout])
+      #|> discard_files_no_errors
       |> Parser.reject_empty
 
     #stderr
@@ -69,33 +73,41 @@ defmodule Command.Htmlproof do
   # delete every file that has no errors
   # (ie, any file that is not followed by a line starting with "  *  ")
   def discard_files_no_errors(collection) do
+    #Logger.debug "COLLECTION:"; IO.inspect collection
+
     # add extra file element, so it can check if the last file needs to be removed.
     {result, {last_match, last_line_no, reject_lines}} = 
       Enum.map_reduce(collection, {nil, nil, []}, fn({line_no, line}, {last_match, last_line_no, reject_lines})->
-      cond do
-        Parser.match_rule?(line, ~r/^- /) ->
-          if last_match == :file do
-            reject_lines = [last_line_no] ++ reject_lines
-          end
-          last_match = :file
+        if is_nil(line), do: line = ""
+        cond do
+          Parser.match_rule?(line, ~r/^- /) ->
+            if last_match == :file do
+              reject_lines = [last_line_no] ++ reject_lines
+            end
+            last_match = :file
 
-        Parser.match_rule?(line, ~r/^\s+\*\s+/) ->
-          last_match = :error
+          Parser.match_rule?(line, ~r/^\s+\*\s+/) ->
+            last_match = :error
 
-        true ->
-          nil
-      end
-      { {line_no, line}, {last_match, line_no, reject_lines} }
-    end)
+          true ->
+            # skip this line if it's nil
+            line_no = last_line_no 
+        end
+        { {line_no, line}, {last_match, line_no, reject_lines} }
+      end)
 
     # check if last_match was a :file, if so, add line_no to reject_lines
     if last_match == :file do
       reject_lines = [last_line_no] ++ reject_lines
     end
     
-    #Logger.debug "REJECT LINES: #{inspect reject_lines}"
-    #Logger.debug "RESULT: #{inspect(result)}"
-    Enum.reject(result, fn({line_no, _line})-> Enum.member?(reject_lines, line_no) end  )
+    #Logger.debug "REJECT LINES:"; IO.inspect reject_lines
+
+    result = Enum.reject(result, fn({line_no, _line})-> Enum.member?(reject_lines, line_no) end  )
+    
+    #Logger.debug "RESULT:"; IO.inspect result
+
+    result
   end
 
   # Improve OK/ERRROR messages  

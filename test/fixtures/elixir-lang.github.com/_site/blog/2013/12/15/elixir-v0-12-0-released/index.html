@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>Elixir v0.12.0 released - Elixir</title>
+  <link href="http://feeds.feedburner.com/ElixirLang" rel="alternate" title="Elixir's Blog" type="application/atom+xml" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/js/icons/style.css">
+  <!--[if lt IE 8]><!-->
+  <link rel="stylesheet" href="/js/icons/ie7/ie7.css">
+  <!--<![endif]-->
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" id="font-bitter-css" href="http://fonts.googleapis.com/css?family=Bitter&amp;ver=1" type="text/css" media="screen" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+</head>
+
+<body class="blog">
+  <div id="container">
+    <div class="wrap">
+    <div id="header">
+      <div id="branding">
+        <h1 id="site-title">
+          <a href="/" title="Elixir" rel="Home">
+            <img class="logo" src="/images/logo/logo.png" alt="Elixir Logo" />
+          </a>
+        </h1>
+      </div>
+
+      <div id="menu-primary" class="menu-container">
+        <div class="menu">
+          <ul id="menu-primary-items">
+            <li class="menu-item home"><a class="spec" href="/">Home</a></li>
+            <li class="menu-item install"><a class="spec" href="/install.html">Install</a></li>
+            <li class="menu-item getting-started"><a class="spec" href="/getting-started/introduction.html">Getting Started</a></li>
+            <li class="menu-item learning"><a class="spec" href="/learning.html">Learning</a></li>
+            <li class="menu-item docs"><a class="spec" href="/docs.html">Docs</a></li>
+            <li class="menu-item blog"><a class="spec" href="/blog/">Blog</a></li>
+            <li class="menu-item packages"><a class="spec" href="http://hex.pm/">Packages</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+    </div>
+
+    <div id="main">
+
+
+<div id="content">
+  <div class="hfeed">
+  <div class="hentry post">
+    <div class="post-content">
+      <div class="sticky-header">
+        <h1>Elixir v0.12.0 released</h1>
+        
+        <div class="byline">December 15, 2013 · by José Valim . in <a href="/blog/categories.html#releases" class="category">releases</a></div>
+      </div>
+
+      <div class="entry-content">
+        <p>Elixir v0.12.0 has been released with improved enumerables, build patterns and welcoming a new member to our team.</p>
+
+<h2 id="enumerables">Enumerables</h2>
+
+<p>In previous versions, the Enumerable protocol was based on reduce/fold, and while it is very efficient for operations like <code>map</code>, <code>reduce</code> and <code>filter</code>, it was sub-optimal for operations that need to halt, like <code>take</code> and <code>take_while</code>, and it made it impossible for operations like <code>zip</code> to be implemented. </p>
+
+<p>In v0.12.0, Elixir&#39;s Enumerable protocol has been extended to allow suspension and halting mechanisms, making operations like <code>take</code> simpler and operations that require interleaving, like <code>zip</code>, possible.</p>
+
+<p>Although most users don&#39;t need to concern with the implementation of the Enumerable protocol, the side-effect is that both <code>Enum</code> and <code>Stream</code> modules have been considerably extended and improved in this release, with more than 15 new functions added to the <code>Stream</code> module.</p>
+
+<h2 id="mix">Mix</h2>
+
+<p>The tool that received most improvements in this release was Mix. The biggest change is that Mix no longer compiles projects in place but to the <code>_build</code> directory. For example, take the <a href="https://github.com/elixir-lang/ecto">Ecto project</a> that <a href="https://github.com/elixir-lang/ecto/blob/master/mix.exs#L24-L25">depends on <code>postgrex</code> and <code>poolboy</code></a>. When compiled, all the artifacts will be placed in the <code>_build</code> directory like this:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">_build
+└── shared
+    └── lib
+        ├── ecto
+        │   └── ebin
+        |   └── priv
+        ├── poolboy
+        │   └── ebin
+        └── postgrex
+            └── ebin
+</code></pre></div>
+<p>For those familiar with Erlang&#39;s OTP, this is similar to the structure used by OTP when releasing your software. So this new structure makes our software one step close to production and guarantee it is designed correctly since day 1.</p>
+
+<p>This approach comes with the <code>:build_per_environment</code> option which, when set to true, creates a different build per environment (<code>dev</code>, <code>test</code>, <code>production</code> or more). Extremely useful when a project compile different artifacts depending on the compilation environment.</p>
+
+<p>Mix has also added support to optional dependencies and improved common patterns, like the usage of umbrella apps.</p>
+
+<h2 id="welcome,-eric!">Welcome, Eric!</h2>
+
+<p>With this release, we also want to welcome <a href="https://github.com/ericmj">Eric MJ</a> to the Elixir Team. He has done fantastic work on Elixir, helping us maintain the codebase and working on many of the important features from previous releases and now many more to come.</p>
+
+<p>Eric is also maintainer of both <a href="https://github.com/elixir-lang/ecto">Ecto</a> and <a href="https://github.com/ericmj/postgrex">Postgrex</a> projects. Which are proving to be very useful to the Elixir community too!</p>
+
+<h2 id="tidying-up">Tidying up</h2>
+
+<p>There were other small changes, like additions to the <code>Float</code> module and improvements the to the typespec syntax. To see the full list, please <a href="https://github.com/elixir-lang/elixir/blob/v0.12.0/CHANGELOG.md">see the CHANGELOG</a>.</p>
+
+<p>Give Elixir a try! You can start with our <a href="/getting-started/introduction.html">getting started guide</a>, or check out our sidebar for other learning resources.</p>
+
+      </div>
+
+      <!-- <div class="entry-meta">
+      </div> -->
+    </div>
+  </div>
+</div>
+
+</div><!-- #content -->
+
+<div id="sidebar-primary" class="sidebar">
+  <div class="widget news">
+  <h3>
+    News: <a href="/blog/2014/09/18/elixir-v1-0-0-released/">Elixir v1.0 released</a>
+  </h3>
+</div>
+
+<div class="widget search">
+  <form method="get" class="search-form" action="http://www.google.com/search">
+		<div>
+			<input class="search-text" type="text" name="q" placeholder="Search..." id="searchfield">
+			<input type="hidden" name="sitesearch" value="elixir-lang.org">
+			<input class="search-submit button" name="submit" type="submit" value="Search">
+		</div>
+	</form>
+</div>
+  <div class="rss-button">
+    <a href="http://feeds.feedburner.com/ElixirLang" target="_blank"><img src="/images/social/RSSButton.png" alt="RSS button" /></a>
+  </div>
+  <div class="widget categories-list">
+  <h3 class="widget-title">Blog Categories</h3>
+  <ul>
+  
+    <li><a class="spec" href="/blog/categories.html#internals">internals</a></li>
+  
+    <li><a class="spec" href="/blog/categories.html#releases">releases</a></li>
+  
+    <li><a class="spec" href="/blog/categories.html#announcements">announcements</a></li>
+  
+  </ul>
+</div>
+
+  <div class="widget">
+  <h3 class="widget-title">Join the Community</h3>
+  <ul>
+    <li><a class="spec" href="irc://irc.freenode.net/elixir-lang">#elixir-lang on freenode IRC</a></li>
+    <li><a class="spec" href="http://groups.google.com/group/elixir-lang-talk">elixir-talk mailing list (questions)</a></li>
+    <li><a class="spec" href="http://groups.google.com/group/elixir-lang-core">elixir-core mailing list (development)</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir/issues">Issue tracker</a></li>
+    <li><a class="spec" href="http://twitter.com/elixirlang">@elixirlang on Twitter</a></li>
+  </ul>
+</div>
+
+<div class="widget">
+  <h3 class="widget-title">Important links</h3>
+  <ul>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir">Source Code</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir/wiki">Wiki with events, resources and talks organized by the community</a></li>
+    <li><a class="spec" href="/crash-course.html">Crash course for Erlang developers</a></li>
+  </ul>
+</div>
+
+  <div class="widget">
+  <h3 class="widget-title">Code editor support</h3>
+  <ul>
+    <li><a class="spec" href="https://github.com/elixir-lang/emacs-elixir">Emacs Mode</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/elixir-tmbundle">Textmate Bundle</a></li>
+    <li><a class="spec" href="https://github.com/elixir-lang/vim-elixir">Vim Elixir</a></li>
+    <li><a class="spec" href="https://github.com/SteffenBauer/elixir-gtksourceview">GtkSourceView (gedit)</a></li>
+    <li><a class="spec" href="https://github.com/lucasmazza/language-elixir">Atom Package</a></li>
+  </ul>
+</div>
+
+  <div id="sponsors" class="widget">
+  <h3 class="widget-title">Sponsors</h3>
+  <ul>
+    <li class="image"><a href="http://plataformatec.com.br" title="Plataformatec"><img src="/images/logo/plataformatec.png" alt="Plataformatec Logo" width="190" height="74" /></a></li>
+  </ul>
+</div>
+</div>
+
+      </div><!-- #main -->
+
+      <div class="clear"></div>
+
+      <div id="copyright">
+        &copy; 2012-2015 <a href="http://plataformatec.com.br/">Plataformatec</a>. All rights reserved.
+      </div>
+    </div><!-- .wrap -->
+  </div><!-- #container -->
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8268430-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/js/toc/toc.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.toc').toc({
+        title: '',
+        listType: 'ol',
+        minimumHeaders: 2,
+        headers: 'h2, h3, h4, h5, h6',
+        linkHere: true,
+        linkHereTitle: 'Link here',
+        backToTop: true,
+        backToTopId: 'toc',
+        backToTopTitle: 'Back to Table of Contents',
+      });
+      $('.jekyll-toc-header a.jekyll-toc-link-here span.jekyll-toc-icon').addClass('icon icon-link');
+      $('.jekyll-toc-header a.jekyll-toc-back-to-top span.jekyll-toc-icon').addClass('icon icon-chevron-up');
+    });
+
+  </script>
+</body>
+</html>

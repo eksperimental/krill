@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>Module attributes - Elixir</title>
+  <link href="http://feeds.feedburner.com/ElixirLang" rel="alternate" title="Elixir's Blog" type="application/atom+xml" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/js/icons/style.css">
+  <!--[if lt IE 8]><!-->
+  <link rel="stylesheet" href="/js/icons/ie7/ie7.css">
+  <!--<![endif]-->
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" id="font-bitter-css" href="http://fonts.googleapis.com/css?family=Bitter&amp;ver=1" type="text/css" media="screen" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+</head>
+
+<body class="getting-started">
+  <div id="container">
+    <div class="wrap">
+    <div id="header">
+      <div id="branding">
+        <h1 id="site-title">
+          <a href="/" title="Elixir" rel="Home">
+            <img class="logo" src="/images/logo/logo.png" alt="Elixir Logo" />
+          </a>
+        </h1>
+      </div>
+
+      <div id="menu-primary" class="menu-container">
+        <div class="menu">
+          <ul id="menu-primary-items">
+            <li class="menu-item home"><a class="spec" href="/">Home</a></li>
+            <li class="menu-item install"><a class="spec" href="/install.html">Install</a></li>
+            <li class="menu-item getting-started"><a class="spec" href="/getting-started/introduction.html">Getting Started</a></li>
+            <li class="menu-item learning"><a class="spec" href="/learning.html">Learning</a></li>
+            <li class="menu-item docs"><a class="spec" href="/docs.html">Docs</a></li>
+            <li class="menu-item blog"><a class="spec" href="/blog/">Blog</a></li>
+            <li class="menu-item packages"><a class="spec" href="http://hex.pm/">Packages</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+    </div>
+
+    <div id="main">
+
+
+<div id="sidebar-primary" class="sidebar">
+  <div class="widget news">
+  <h3>
+    News: <a href="/blog/2014/09/18/elixir-v1-0-0-released/">Elixir v1.0 released</a>
+  </h3>
+</div>
+
+<div class="widget search">
+  <form method="get" class="search-form" action="http://www.google.com/search">
+		<div>
+			<input class="search-text" type="text" name="q" placeholder="Search..." id="searchfield">
+			<input type="hidden" name="sitesearch" value="elixir-lang.org">
+			<input class="search-submit button" name="submit" type="submit" value="Search">
+		</div>
+	</form>
+</div>
+
+  
+  
+    <div class="widget">
+     <h3 class="widget-title">Getting Started</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/introduction.html" title="Introduction">Introduction</a></li>
+        
+          <li><a class="spec" href="/getting-started/basic-types.html" title="Basic types">Basic types</a></li>
+        
+          <li><a class="spec" href="/getting-started/basic-operators.html" title="Basic operators">Basic operators</a></li>
+        
+          <li><a class="spec" href="/getting-started/pattern-matching.html" title="Pattern matching">Pattern matching</a></li>
+        
+          <li><a class="spec" href="/getting-started/case-cond-and-if.html" title="case, cond and if">case, cond and if</a></li>
+        
+          <li><a class="spec" href="/getting-started/binaries-strings-and-char-lists.html" title="Binaries, strings and char lists">Binaries, strings and char lists</a></li>
+        
+          <li><a class="spec" href="/getting-started/maps-and-dicts.html" title="Keywords, maps and dicts">Keywords, maps and dicts</a></li>
+        
+          <li><a class="spec" href="/getting-started/modules.html" title="Modules">Modules</a></li>
+        
+          <li><a class="spec" href="/getting-started/recursion.html" title="Recursion">Recursion</a></li>
+        
+          <li><a class="spec" href="/getting-started/enumerables-and-streams.html" title="Enumerables and streams">Enumerables and streams</a></li>
+        
+          <li><a class="spec" href="/getting-started/processes.html" title="Processes">Processes</a></li>
+        
+          <li><a class="spec" href="/getting-started/io-and-the-file-system.html" title="IO and the file system">IO and the file system</a></li>
+        
+          <li><a class="spec" href="/getting-started/alias-require-and-import.html" title="alias, require and import">alias, require and import</a></li>
+        
+          <li><a class="spec" href="/getting-started/module-attributes.html" title="Module attributes">Module attributes</a></li>
+        
+          <li><a class="spec" href="/getting-started/structs.html" title="Structs">Structs</a></li>
+        
+          <li><a class="spec" href="/getting-started/protocols.html" title="Protocols">Protocols</a></li>
+        
+          <li><a class="spec" href="/getting-started/comprehensions.html" title="Comprehensions">Comprehensions</a></li>
+        
+          <li><a class="spec" href="/getting-started/sigils.html" title="Sigils">Sigils</a></li>
+        
+          <li><a class="spec" href="/getting-started/try-catch-and-rescue.html" title="try, catch and rescue">try, catch and rescue</a></li>
+        
+          <li><a class="spec" href="/getting-started/typespecs-and-behaviours.html" title="Typespecs and behaviours">Typespecs and behaviours</a></li>
+        
+          <li><a class="spec" href="/getting-started/where-to-go-next.html" title="Where to go next">Where to go next</a></li>
+        
+      </ol>
+    </div>
+  
+    <div class="widget">
+     <h3 class="widget-title">Mix and OTP</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/introduction-to-mix.html" title="Introduction to Mix">Introduction to Mix</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/agent.html" title="Agent">Agent</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/genserver.html" title="GenServer">GenServer</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/genevent.html" title="GenEvent">GenEvent</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/supervisor-and-application.html" title="Supervisor and Application">Supervisor and Application</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/ets.html" title="ETS">ETS</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/dependencies-and-umbrella-apps.html" title="Dependencies and umbrella apps">Dependencies and umbrella apps</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/task-and-gen-tcp.html" title="Task and gen-tcp">Task and gen-tcp</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/docs-tests-and-pipelines.html" title="Docs, tests and pipelines">Docs, tests and pipelines</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/distributed-tasks-and-configuration.html" title="Distributed tasks and configuration">Distributed tasks and configuration</a></li>
+        
+      </ol>
+    </div>
+  
+    <div class="widget">
+     <h3 class="widget-title">Meta-programming in Elixir</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/meta/quote-and-unquote.html" title="Quote and unquote">Quote and unquote</a></li>
+        
+          <li><a class="spec" href="/getting-started/meta/macros.html" title="Macros">Macros</a></li>
+        
+          <li><a class="spec" href="/getting-started/meta/domain-specific-languages.html" title="Domain Specific Languages">Domain Specific Languages</a></li>
+        
+      </ol>
+    </div>
+  
+
+  <div id="sponsors" class="widget">
+  <h3 class="widget-title">Sponsors</h3>
+  <ul>
+    <li class="image"><a href="http://plataformatec.com.br" title="Plataformatec"><img src="/images/logo/plataformatec.png" alt="Plataformatec Logo" width="190" height="74" /></a></li>
+  </ul>
+</div>
+</div>
+
+<div id="content">
+  <article>
+    <h1 id="module-attributes">Module attributes</h1>
+
+<div id="toc" class="toc"></div>
+
+<p>Module attributes in Elixir serve three purposes:</p>
+
+<ol>
+<li>They serve to annotate the module, often with information to be used by the user or the <abbr title="Virtual Machine">VM</abbr>.</li>
+<li>They work as constants.</li>
+<li>They work as a temporary module storage to be used during compilation.</li>
+</ol>
+
+<p>Let&#39;s check each case, one by one.</p>
+
+<h2 id="as-annotations">As annotations</h2>
+
+<p>Elixir brings the concept of module attributes from Erlang. For example:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">MyServer</span> <span class="k">do</span>
+  <span class="na">@vsn</span> <span class="mi">2</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>In the example above, we are explicitly setting the version attribute for that module. <code>@vsn</code> is used by the code reloading mechanism in the Erlang <abbr title="Virtual Machine">VM</abbr> to check if a module has been updated or not. If no version is specified, the version is set to the MD5 checksum of the module functions.</p>
+
+<p>Elixir has a handful of reserved attributes. Here are just a few of them, the most commonly used ones:</p>
+
+<ul>
+<li><code>@moduledoc</code> - provides documentation for the current module.</li>
+<li><code>@doc</code> - provides documentation for the function or macro that follows the attribute.</li>
+<li><code>@behaviour</code> - (notice the British spelling) used for specifying an <abbr title="Open Telecom Platform">OTP</abbr> or user-defined behaviour.</li>
+<li><code>@before_compile</code> - provides a hook that will be invoked before the module is compiled. This makes it possible to inject functions inside the module exactly before compilation.</li>
+</ul>
+
+<p><code>@moduledoc</code> and <code>@doc</code> are by far the most used attributes, and we expect you to use them a lot. Elixir treats documentation as first-class and provides many functions to access documentation.</p>
+
+<p>Let&#39;s go back to the <code>Math</code> module defined in the previous chapters, add some documentation and save it to the <code>math.ex</code> file:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Math</span> <span class="k">do</span>
+  <span class="na">@moduledoc</span> <span class="sh">&quot;&quot;&quot;</span>
+<span class="sh">  Provides math-related functions.</span>
+
+<span class="sh">  </span><span class="err">##</span><span class="sh"> Examples</span>
+
+<span class="sh">      iex&gt; Math.sum(1, 2)</span>
+<span class="sh">      3</span>
+
+<span class="sh">  &quot;&quot;&quot;</span>
+
+  <span class="na">@doc</span> <span class="sh">&quot;&quot;&quot;</span>
+<span class="sh">  Calculates the sum of two numbers.</span>
+<span class="sh">  &quot;&quot;&quot;</span>
+  <span class="kd">def</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="ss">do</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Elixir promotes the use of markdown with heredocs to write readable documentation. Heredocs are multiline strings, they start and end with triple quotes, keeping the formatting of the inner text. We can access the documentation of any compiled module directly from IEx:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>elixirc math.ex
+<span class="nv">$ </span>iex
+</code></pre></div><div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="n">h</span> <span class="nc">Math</span> <span class="c1"># Access the docs for the module Math</span>
+<span class="go">...</span>
+<span class="gp">iex&gt; </span><span class="n">h</span> <span class="nc">Math</span><span class="p">.</span><span class="n">sum</span> <span class="c1"># Access the docs for the sum function</span>
+<span class="go">...</span>
+</code></pre></div>
+<p>We also provide a tool called <a href="https://github.com/elixir-lang/ex_doc">ExDoc</a> which is used to generate HTML pages from the documentation.</p>
+
+<p>You can take a look at the docs for <a href="/docs/stable/elixir/Module.html">Module</a> for a complete list of supported attributes. Elixir also uses attributes to define <a href="/docs/stable/elixir/Kernel.Typespec.html">typespecs</a>, via:</p>
+
+<ul>
+<li><code>@spec</code> - provides a specification for a function.</li>
+<li><code>@callback</code> - provides a specification for the behaviour callback.</li>
+<li><code>@type</code> - defines a type to be used in <code>@spec</code>.</li>
+<li><code>@typep</code> - defines a private type to be used in <code>@spec</code>.</li>
+<li><code>@opaque</code> - defines an opaque type to be used in <code>@spec</code>.</li>
+</ul>
+
+<p>This section covers built-in attributes. However, attributes can also be used by developers or extended by libraries to support custom behaviour.</p>
+
+<h2 id="as-constants">As constants</h2>
+
+<p>Elixir developers will often use module attributes to be used as constants:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">MyServer</span> <span class="k">do</span>
+  <span class="na">@initial_state</span> <span class="p">%{</span><span class="ss">host</span><span class="p">:</span> <span class="s2">&quot;147.0.0.1&quot;</span><span class="p">,</span> <span class="ss">port</span><span class="p">:</span> <span class="mi">3456</span><span class="p">}</span>
+  <span class="nc">IO</span><span class="p">.</span><span class="n">inspect</span> <span class="na">@initial_state</span>
+<span class="k">end</span>
+</code></pre></div>
+<blockquote>
+<p>Note: Unlike Erlang, user defined attributes are not stored in the module by default. The value exists only during compilation time. A developer can configure an attribute to behave closer to Erlang by calling <a href="/docs/stable/elixir/Module.html#register_attribute/3"><code>Module.register_attribute/3</code></a>.</p>
+</blockquote>
+
+<p>Trying to access an attribute that was not defined will print a warning:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">MyServer</span> <span class="k">do</span>
+  <span class="na">@unknown</span>
+<span class="k">end</span>
+<span class="ss">warning</span><span class="p">:</span> <span class="n">undefined</span> <span class="n">module</span> <span class="n">attribute</span> <span class="na">@unknown</span><span class="p">,</span> <span class="n">please</span> <span class="n">remove</span> <span class="n">access</span> <span class="n">to</span> <span class="na">@unknown</span> <span class="ow">or</span> <span class="n">explicitly</span> <span class="n">set</span> <span class="n">it</span> <span class="n">to</span> <span class="no">nil</span> <span class="n">before</span> <span class="n">access</span>
+</code></pre></div>
+<p>Finally, attributes can also be read inside functions:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">MyServer</span> <span class="k">do</span>
+  <span class="na">@my_data</span> <span class="mi">14</span>
+  <span class="kd">def</span> <span class="n">first_data</span><span class="p">,</span> <span class="ss">do</span><span class="p">:</span> <span class="na">@my_data</span>
+  <span class="na">@my_data</span> <span class="mi">13</span>
+  <span class="kd">def</span> <span class="n">second_data</span><span class="p">,</span> <span class="ss">do</span><span class="p">:</span> <span class="na">@my_data</span>
+<span class="k">end</span>
+
+<span class="nc">MyServer</span><span class="p">.</span><span class="n">first_data</span> <span class="c1">#=&gt; 14</span>
+<span class="nc">MyServer</span><span class="p">.</span><span class="n">second_data</span> <span class="c1">#=&gt; 13</span>
+</code></pre></div>
+<p>Notice that reading an attribute inside a function takes a snapshot of its current value. In other words, the value is read at compilation time and not at runtime. As we are going to see, this makes attributes useful to be used as storage during module compilation.</p>
+
+<h2 id="as-temporary-storage">As temporary storage</h2>
+
+<p>One of the projects in the Elixir organization is <a href="https://github.com/elixir-lang/plug">the <code>Plug</code> project</a>, which is meant to be a common foundation for building web libraries and frameworks in Elixir.</p>
+
+<p>The Plug library also allows developers to define their own plugs which can be run in a web server:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">MyPlug</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="nc">Plug.Builder</span>
+
+  <span class="n">plug</span> <span class="ss">:set_header</span>
+  <span class="n">plug</span> <span class="ss">:send_ok</span>
+
+  <span class="kd">def</span> <span class="n">set_header</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_opts</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">put_resp_header</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;x-header&quot;</span><span class="p">,</span> <span class="s2">&quot;set&quot;</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kd">def</span> <span class="n">send_ok</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_opts</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">send</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="s2">&quot;Running MyPlug with Cowboy on http://localhost:4000&quot;</span>
+<span class="nc">Plug.Adapters.Cowboy</span><span class="p">.</span><span class="n">http</span> <span class="nc">MyPlug</span><span class="p">,</span> <span class="p">[]</span>
+</code></pre></div>
+<p>In the example above, we have used the <code>plug/1</code> macro to connect functions that will be invoked when there is a web request. Internally, every time you call <code>plug/1</code>, the Plug library stores the given argument in a <code>@plugs</code> attribute. Just before the module is compiled, Plug runs a callback that defines a method (<code>call/2</code>) which handles http requests. This method will run all plugs inside <code>@plugs</code> in order.</p>
+
+<p>In order to understand the underlying code, we&#39;d need macros, so we will revisit this pattern in the meta-programming guide. However the focus here is exactly on how using module attributes as storage allow developers to create DSLs.</p>
+
+<p>Another example comes from the ExUnit framework which uses module attributes as annotation and storage:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">MyTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="nc">ExUnit.Case</span>
+
+  <span class="na">@tag</span> <span class="ss">:external</span>
+  <span class="n">test</span> <span class="s2">&quot;contacts external service&quot;</span> <span class="k">do</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>Tags in ExUnit are used to annotate tests. Tags can be later used to filter tests. For example, you can avoid running external tests on your machine because they are slow and dependent on other services, while they can still be enabled in your build system.</p>
+
+<p>We hope this section shines some light on how Elixir supports meta-programming and how module attributes play an important role when doing so.</p>
+
+<p>In the next chapters we&#39;ll explore structs and protocols before moving to exception handling and other constructs like sigils and comprehensions.</p>
+
+  </article><!-- .hfeed -->
+
+  
+  
+  
+  
+  
+
+  
+  
+    
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+          <div class="pagination loop-pagination">
+            
+              <a href="/getting-started/alias-require-and-import.html" class="previous page-numbers spec" title="alias, require and import">&larr; Previous</a>
+            
+              <a class="page-numbers spec" href="#container">Top</a>
+            
+              
+              <a href="/getting-started/structs.html" class="previous page-numbers spec" title="Structs">Next &rarr;</a>
+            
+          </div>
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+    
+  
+    
+  
+    
+  
+
+</div><!-- #content -->
+
+      </div><!-- #main -->
+
+      <div class="clear"></div>
+
+      <div id="copyright">
+        &copy; 2012-2015 <a href="http://plataformatec.com.br/">Plataformatec</a>. All rights reserved.
+      </div>
+    </div><!-- .wrap -->
+  </div><!-- #container -->
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8268430-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/js/toc/toc.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.toc').toc({
+        title: '',
+        listType: 'ol',
+        minimumHeaders: 2,
+        headers: 'h2, h3, h4, h5, h6',
+        linkHere: true,
+        linkHereTitle: 'Link here',
+        backToTop: true,
+        backToTopId: 'toc',
+        backToTopTitle: 'Back to Table of Contents',
+      });
+      $('.jekyll-toc-header a.jekyll-toc-link-here span.jekyll-toc-icon').addClass('icon icon-link');
+      $('.jekyll-toc-header a.jekyll-toc-back-to-top span.jekyll-toc-icon').addClass('icon icon-chevron-up');
+    });
+
+  </script>
+</body>
+</html>

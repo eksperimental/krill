@@ -1,6 +1,7 @@
 defmodule Krill.Process do
   alias Porcelain.Result
   require Logger
+  import Krill.Macro
 
   @moduledoc """
   Deals with anything related to Porcelain.Process and Results
@@ -54,10 +55,7 @@ defmodule Krill.Process do
 
   def determine_status(state) do
     cond do
-      !(state.stderr) ->
-        0
-
-      "" == state.stderr ->
+      empty?(state.stderr) ->
         0
 
       # status_raw is 0, but stderr neither empty, nor falsey

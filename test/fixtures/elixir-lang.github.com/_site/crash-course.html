@@ -270,6 +270,7 @@
 <div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="n">is_atom</span> <span class="ss">:ok</span>                 <span class="c1">#=&gt; true</span>
 <span class="n">is_atom</span> <span class="ss">:&#39;ok&#39;</span>               <span class="c1">#=&gt; true</span>
 <span class="n">is_atom</span> <span class="ss">:&quot;Multiple words&quot;</span>   <span class="c1">#=&gt; true</span>
+<span class="n">is_atom</span> <span class="ss">:&quot;&quot;</span>                 <span class="c1">#=&gt; true</span>
 </code></pre></div>
 <h3 id="tuples">Tuples</h3>
 
@@ -283,12 +284,12 @@
 <p>That said, Elixir does not import the default <code>element</code> and <code>setelement</code> functions, but instead provides <code>elem</code> and <code>put_elem</code>:</p>
 
 <p><strong>Erlang</strong></p>
-<div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="nb">element</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="p">})</span>       <span class="c">%=&gt; a</span>
-<span class="nb">setelement</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="p">},</span> <span class="n">d</span><span class="p">)</span> <span class="c">%=&gt; { d, b, c }</span>
+<div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="nb">element</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">})</span>       <span class="c">%=&gt; a</span>
+<span class="nb">setelement</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">},</span> <span class="n">d</span><span class="p">)</span> <span class="c">%=&gt; {d, b, c}</span>
 </code></pre></div>
 <p><strong>Elixir</strong></p>
-<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="n">elem</span><span class="p">({</span> <span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span><span class="p">,</span> <span class="ss">:c</span> <span class="p">},</span> <span class="mi">0</span><span class="p">)</span>        <span class="c1">#=&gt; :a</span>
-<span class="n">put_elem</span><span class="p">({</span> <span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span><span class="p">,</span> <span class="ss">:c</span> <span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">:d</span><span class="p">)</span> <span class="c1">#=&gt; { :d, :b, :c }</span>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="n">elem</span><span class="p">({</span><span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span><span class="p">,</span> <span class="ss">:c</span><span class="p">},</span> <span class="mi">0</span><span class="p">)</span>         <span class="c1">#=&gt; :a</span>
+<span class="n">put_elem</span><span class="p">({</span><span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span><span class="p">,</span> <span class="ss">:c</span><span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">:d</span><span class="p">)</span> <span class="c1">#=&gt; {:d, :b, :c}</span>
 </code></pre></div>
 <h3 id="lists-and-binaries">Lists and binaries</h3>
 
@@ -305,9 +306,9 @@
 <span class="n">is_binary</span> <span class="p">&lt;&lt;</span><span class="s2">&quot;Hello&quot;</span><span class="p">&gt;&gt;</span>    <span class="c1">#=&gt; true</span>
 <span class="p">&lt;&lt;</span><span class="s2">&quot;Hello&quot;</span><span class="p">&gt;&gt;</span> <span class="o">===</span> <span class="s2">&quot;Hello&quot;</span>  <span class="c1">#=&gt; true</span>
 </code></pre></div>
-<p>In Elixir, the word <strong>string</strong> means a utf-8 binary and there is a <code>String</code> module that works on such data. Elixir also expects your source files to be utf-8 encoded. On the other hand, <strong>string</strong> in Erlang refers to char lists and there is a <code>:string</code> module, that&#39;s not utf-8 aware and works mostly with char lists.</p>
+<p>In Elixir, the word <strong>string</strong> means a UTF-8 binary and there is a <code>String</code> module that works on such data. Elixir also expects your source files to be UTF-8 encoded. On the other hand, <strong>string</strong> in Erlang refers to char lists and there is a <code>:string</code> module, that&#39;s not UTF-8 aware and works mostly with char lists.</p>
 
-<p>Elixir also supports multiline strings (also called heredocs):</p>
+<p>Elixir also supports multiline strings (also called <em>heredocs</em>):</p>
 <div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="n">is_binary</span> <span class="sh">&quot;&quot;&quot;</span>
 <span class="sh">This is a binary</span>
 <span class="sh">spanning several</span>
@@ -320,7 +321,7 @@
 <p>Elixir offers a literal syntax for creating a list of two-item tuples where the first item in the tuple is an atom and calls them keyword lists:</p>
 
 <p><strong>Erlang</strong></p>
-<div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="p">[{</span><span class="n">another_key</span><span class="p">,</span><span class="mi">20</span><span class="p">},{</span><span class="n">key</span><span class="p">,</span><span class="mi">10</span><span class="p">}]</span>
+<div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="p">[{</span><span class="n">another_key</span><span class="p">,</span> <span class="mi">20</span><span class="p">},</span> <span class="p">{</span><span class="n">key</span><span class="p">,</span> <span class="mi">10</span><span class="p">}]</span>
 </code></pre></div>
 <p><strong>Elixir</strong></p>
 <div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="n">kw</span> <span class="p">=</span> <span class="p">[</span><span class="ss">another_key</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="ss">key</span><span class="p">:</span> <span class="mi">10</span><span class="p">]</span>
@@ -581,7 +582,7 @@
 <span class="c1">#=&gt; &quot;Empty&quot;</span>
 
 <span class="n">f</span><span class="p">.({</span><span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span><span class="p">})</span>
-<span class="c1">#=&gt; &quot;All your {:a,:b} are belong to us&quot;</span>
+<span class="c1">#=&gt; &quot;All your {:a, :b} are belong to us&quot;</span>
 </code></pre></div>
 <h3 id="first-class-functions">First-class functions</h3>
 
@@ -603,7 +604,7 @@
   <span class="k">end</span>
 <span class="k">end</span>
 
-<span class="nc">Enum</span><span class="p">.</span><span class="n">map</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="o">&amp;</span><span class="nc">Math</span><span class="p">.</span><span class="n">square</span><span class="o">/</span><span class="mi">1</span>
+<span class="nc">Enum</span><span class="p">.</span><span class="n">map</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="o">&amp;</span><span class="nc">Math</span><span class="p">.</span><span class="n">square</span><span class="o">/</span><span class="mi">1</span>
 <span class="c1">#=&gt; [1, 4, 9]</span>
 </code></pre></div>
 <h3 id="partials-in-elixir">Partials in Elixir</h3>
@@ -622,7 +623,7 @@
   <span class="k">end</span>
 <span class="k">end</span>
 
-<span class="nc">Enum</span><span class="p">.</span><span class="n">map</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="o">&amp;</span><span class="nc">Math</span><span class="p">.</span><span class="n">square</span><span class="o">/</span><span class="mi">1</span>
+<span class="nc">Enum</span><span class="p">.</span><span class="n">map</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="o">&amp;</span><span class="nc">Math</span><span class="p">.</span><span class="n">square</span><span class="o">/</span><span class="mi">1</span>
 
 <span class="c1">#=&gt; [1, 4, 9]</span>
 </code></pre></div>
@@ -635,16 +636,16 @@
 <p>The <code>case</code> construct provides control flow based purely on pattern matching.</p>
 
 <p><strong>Erlang</strong></p>
-<div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="k">case</span> <span class="p">{</span> <span class="nv">X</span><span class="p">,</span> <span class="nv">Y</span> <span class="p">}</span> <span class="k">of</span>
-  <span class="p">{</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">}</span> <span class="o">-&gt;</span> <span class="n">ok</span><span class="p">;</span>
-  <span class="p">{</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="p">}</span> <span class="o">-&gt;</span> <span class="n">good</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="k">case</span> <span class="p">{</span><span class="nv">X</span><span class="p">,</span> <span class="nv">Y</span><span class="p">}</span> <span class="k">of</span>
+  <span class="p">{</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">}</span> <span class="o">-&gt;</span> <span class="n">ok</span><span class="p">;</span>
+  <span class="p">{</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">}</span> <span class="o">-&gt;</span> <span class="n">good</span><span class="p">;</span>
   <span class="nv">Else</span> <span class="o">-&gt;</span> <span class="nv">Else</span>
 <span class="k">end</span>
 </code></pre></div>
 <p><strong>Elixir</strong></p>
-<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="k">case</span> <span class="p">{</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">}</span> <span class="k">do</span>
-  <span class="p">{</span> <span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span> <span class="p">}</span> <span class="p">-&gt;</span> <span class="ss">:ok</span>
-  <span class="p">{</span> <span class="ss">:b</span><span class="p">,</span> <span class="ss">:c</span> <span class="p">}</span> <span class="p">-&gt;</span> <span class="ss">:good</span>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="k">case</span> <span class="p">{</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">}</span> <span class="k">do</span>
+  <span class="p">{</span><span class="ss">:a</span><span class="p">,</span> <span class="ss">:b</span><span class="p">}</span> <span class="p">-&gt;</span> <span class="ss">:ok</span>
+  <span class="p">{</span><span class="ss">:b</span><span class="p">,</span> <span class="ss">:c</span><span class="p">}</span> <span class="p">-&gt;</span> <span class="ss">:good</span>
   <span class="n">other</span> <span class="p">-&gt;</span> <span class="n">other</span>
 <span class="k">end</span>
 </code></pre></div>
@@ -715,10 +716,10 @@
 <p><strong>Erlang</strong></p>
 <div class="highlight"><pre><code class="language-erlang" data-lang="erlang"><span class="nv">Pid</span> <span class="o">=</span> <span class="n">self</span><span class="p">().</span>
 
-<span class="nv">Pid</span> <span class="o">!</span> <span class="p">{</span> <span class="n">hello</span> <span class="p">}.</span>
+<span class="nv">Pid</span> <span class="o">!</span> <span class="p">{</span><span class="n">hello</span><span class="p">}.</span>
 
 <span class="k">receive</span>
-  <span class="p">{</span> <span class="n">hello</span> <span class="p">}</span> <span class="o">-&gt;</span> <span class="n">ok</span><span class="p">;</span>
+  <span class="p">{</span><span class="n">hello</span><span class="p">}</span> <span class="o">-&gt;</span> <span class="n">ok</span><span class="p">;</span>
   <span class="nv">Other</span> <span class="o">-&gt;</span> <span class="nv">Other</span>
 <span class="k">after</span>
   <span class="mi">10</span> <span class="o">-&gt;</span> <span class="n">timeout</span>
@@ -727,10 +728,10 @@
 <p><strong>Elixir</strong></p>
 <div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="n">pid</span> <span class="p">=</span> <span class="nc">Kernel</span><span class="p">.</span><span class="n">self</span>
 
-<span class="n">send</span> <span class="n">pid</span><span class="p">,</span> <span class="p">{</span> <span class="ss">:hello</span> <span class="p">}</span>
+<span class="n">send</span> <span class="n">pid</span><span class="p">,</span> <span class="p">{</span><span class="ss">:hello</span><span class="p">}</span>
 
 <span class="k">receive</span> <span class="k">do</span>
-  <span class="p">{</span> <span class="ss">:hello</span> <span class="p">}</span> <span class="p">-&gt;</span> <span class="ss">:ok</span>
+  <span class="p">{</span><span class="ss">:hello</span><span class="p">}</span> <span class="p">-&gt;</span> <span class="ss">:ok</span>
   <span class="n">other</span> <span class="p">-&gt;</span> <span class="n">other</span>
 <span class="k">after</span>
   <span class="mi">10</span> <span class="p">-&gt;</span> <span class="ss">:timeout</span>

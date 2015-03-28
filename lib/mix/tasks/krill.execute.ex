@@ -38,9 +38,6 @@ defmodule Mix.Tasks.Krill.Execute do
         Mix.Task.run "app.start"
         modules = Enum.map(module_names, &(Module.concat([Command, String.capitalize(&1)])))
         
-        #start_jobs(modules, :run)
-        #collect_responses(length(modules))
-
         Enum.map(modules, fn(module) ->
           Task.async(module, :run, [])
         end)
@@ -52,32 +49,5 @@ defmodule Mix.Tasks.Krill.Execute do
         exit({:shotdown, "No module_names provided"})
     end
   end
-
-  defp start_jobs(modules, fun) do
-    caller = self
-    Enum.each(modules, fn(module) ->
-      spawn(fn() ->
-        execute_job(caller, module, fun)
-      end)
-    end)
-  end
-
-  defp execute_job(caller, module, fun) do
-    response = apply(module, fun, [])
-    #caller <- {:response, response}
-    send( caller, {:response, response})
-  end
-
-  defp collect_responses(expected) do
-    Enum.map(1..expected, fn(_) ->
-      get_response
-    end)
-  end
-
-  defp get_response do
-    receive do
-      {:response, response} -> response
-    end
-  end
-
+  
 end

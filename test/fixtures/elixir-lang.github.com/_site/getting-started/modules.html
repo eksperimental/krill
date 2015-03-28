@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>Modules - Elixir</title>
+  <link href="http://feeds.feedburner.com/ElixirLang" rel="alternate" title="Elixir's Blog" type="application/atom+xml" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/js/icons/style.css">
+  <!--[if lt IE 8]><!-->
+  <link rel="stylesheet" href="/js/icons/ie7/ie7.css">
+  <!--<![endif]-->
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" id="font-bitter-css" href="http://fonts.googleapis.com/css?family=Bitter&amp;ver=1" type="text/css" media="screen" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+</head>
+
+<body class="getting-started">
+  <div id="container">
+    <div class="wrap">
+    <div id="header">
+      <div id="branding">
+        <h1 id="site-title">
+          <a href="/" title="Elixir" rel="Home">
+            <img class="logo" src="/images/logo/logo.png" alt="Elixir Logo" />
+          </a>
+        </h1>
+      </div>
+
+      <div id="menu-primary" class="menu-container">
+        <div class="menu">
+          <ul id="menu-primary-items">
+            <li class="menu-item home"><a class="spec" href="/">Home</a></li>
+            <li class="menu-item install"><a class="spec" href="/install.html">Install</a></li>
+            <li class="menu-item getting-started"><a class="spec" href="/getting-started/introduction.html">Getting Started</a></li>
+            <li class="menu-item learning"><a class="spec" href="/learning.html">Learning</a></li>
+            <li class="menu-item docs"><a class="spec" href="/docs.html">Docs</a></li>
+            <li class="menu-item blog"><a class="spec" href="/blog/">Blog</a></li>
+            <li class="menu-item packages"><a class="spec" href="http://hex.pm/">Packages</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+    </div>
+
+    <div id="main">
+
+
+<div id="sidebar-primary" class="sidebar">
+  <div class="widget news">
+  <h3>
+    News: <a href="/blog/2014/09/18/elixir-v1-0-0-released/">Elixir v1.0 released</a>
+  </h3>
+</div>
+
+<div class="widget search">
+  <form method="get" class="search-form" action="http://www.google.com/search">
+		<div>
+			<input class="search-text" type="text" name="q" placeholder="Search..." id="searchfield">
+			<input type="hidden" name="sitesearch" value="elixir-lang.org">
+			<input class="search-submit button" name="submit" type="submit" value="Search">
+		</div>
+	</form>
+</div>
+
+  
+  
+    <div class="widget">
+     <h3 class="widget-title">Getting Started</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/introduction.html" title="Introduction">Introduction</a></li>
+        
+          <li><a class="spec" href="/getting-started/basic-types.html" title="Basic types">Basic types</a></li>
+        
+          <li><a class="spec" href="/getting-started/basic-operators.html" title="Basic operators">Basic operators</a></li>
+        
+          <li><a class="spec" href="/getting-started/pattern-matching.html" title="Pattern matching">Pattern matching</a></li>
+        
+          <li><a class="spec" href="/getting-started/case-cond-and-if.html" title="case, cond and if">case, cond and if</a></li>
+        
+          <li><a class="spec" href="/getting-started/binaries-strings-and-char-lists.html" title="Binaries, strings and char lists">Binaries, strings and char lists</a></li>
+        
+          <li><a class="spec" href="/getting-started/maps-and-dicts.html" title="Keywords, maps and dicts">Keywords, maps and dicts</a></li>
+        
+          <li><a class="spec" href="/getting-started/modules.html" title="Modules">Modules</a></li>
+        
+          <li><a class="spec" href="/getting-started/recursion.html" title="Recursion">Recursion</a></li>
+        
+          <li><a class="spec" href="/getting-started/enumerables-and-streams.html" title="Enumerables and streams">Enumerables and streams</a></li>
+        
+          <li><a class="spec" href="/getting-started/processes.html" title="Processes">Processes</a></li>
+        
+          <li><a class="spec" href="/getting-started/io-and-the-file-system.html" title="IO and the file system">IO and the file system</a></li>
+        
+          <li><a class="spec" href="/getting-started/alias-require-and-import.html" title="alias, require and import">alias, require and import</a></li>
+        
+          <li><a class="spec" href="/getting-started/module-attributes.html" title="Module attributes">Module attributes</a></li>
+        
+          <li><a class="spec" href="/getting-started/structs.html" title="Structs">Structs</a></li>
+        
+          <li><a class="spec" href="/getting-started/protocols.html" title="Protocols">Protocols</a></li>
+        
+          <li><a class="spec" href="/getting-started/comprehensions.html" title="Comprehensions">Comprehensions</a></li>
+        
+          <li><a class="spec" href="/getting-started/sigils.html" title="Sigils">Sigils</a></li>
+        
+          <li><a class="spec" href="/getting-started/try-catch-and-rescue.html" title="try, catch and rescue">try, catch and rescue</a></li>
+        
+          <li><a class="spec" href="/getting-started/typespecs-and-behaviours.html" title="Typespecs and behaviours">Typespecs and behaviours</a></li>
+        
+          <li><a class="spec" href="/getting-started/where-to-go-next.html" title="Where to go next">Where to go next</a></li>
+        
+      </ol>
+    </div>
+  
+    <div class="widget">
+     <h3 class="widget-title">Mix and OTP</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/introduction-to-mix.html" title="Introduction to Mix">Introduction to Mix</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/agent.html" title="Agent">Agent</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/genserver.html" title="GenServer">GenServer</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/genevent.html" title="GenEvent">GenEvent</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/supervisor-and-application.html" title="Supervisor and Application">Supervisor and Application</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/ets.html" title="ETS">ETS</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/dependencies-and-umbrella-apps.html" title="Dependencies and umbrella apps">Dependencies and umbrella apps</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/task-and-gen-tcp.html" title="Task and gen-tcp">Task and gen-tcp</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/docs-tests-and-pipelines.html" title="Docs, tests and pipelines">Docs, tests and pipelines</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/distributed-tasks-and-configuration.html" title="Distributed tasks and configuration">Distributed tasks and configuration</a></li>
+        
+      </ol>
+    </div>
+  
+    <div class="widget">
+     <h3 class="widget-title">Meta-programming in Elixir</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/meta/quote-and-unquote.html" title="Quote and unquote">Quote and unquote</a></li>
+        
+          <li><a class="spec" href="/getting-started/meta/macros.html" title="Macros">Macros</a></li>
+        
+          <li><a class="spec" href="/getting-started/meta/domain-specific-languages.html" title="Domain Specific Languages">Domain Specific Languages</a></li>
+        
+      </ol>
+    </div>
+  
+
+  <div id="sponsors" class="widget">
+  <h3 class="widget-title">Sponsors</h3>
+  <ul>
+    <li class="image"><a href="http://plataformatec.com.br" title="Plataformatec"><img src="/images/logo/plataformatec.png" alt="Plataformatec Logo" width="190" height="74" /></a></li>
+  </ul>
+</div>
+</div>
+
+<div id="content">
+  <article>
+    <h1 id="modules">Modules</h1>
+
+<div id="toc" class="toc"></div>
+
+<p>In Elixir we group several functions into modules. We&#39;ve already used many different modules in the previous chapters such as <a href="/docs/stable/elixir/String.html">the <code>String</code> module</a>:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">String</span><span class="p">.</span><span class="n">length</span> <span class="s2">&quot;hello&quot;</span>
+<span class="go">5</span>
+</code></pre></div>
+<p>In order to create our own modules in Elixir, we use the <code>defmodule</code> macro. We use the <code>def</code> macro to define functions in that module:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="kd">defmodule</span> <span class="nc">Math</span> <span class="k">do</span>
+<span class="gp">...&gt; </span>  <span class="kd">def</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+<span class="gp">...&gt; </span>    <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="gp">...&gt; </span>  <span class="k">end</span>
+<span class="gp">...&gt; </span><span class="k">end</span>
+
+<span class="gp">iex&gt; </span><span class="nc">Math</span><span class="p">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">3</span>
+</code></pre></div>
+<p>In the following sections, our examples are going to get a bit more complex, and it can be tricky to type them all in the shell. It&#39;s about time for us to learn how to compile Elixir code and also how to run Elixir scripts.</p>
+
+<h2 id="compilation">Compilation</h2>
+
+<p>Most of the time it is convenient to write modules into files so they can be compiled and reused. Let&#39;s assume we have a file named <code>math.ex</code> with the following contents:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Math</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>This file can be compiled using <code>elixirc</code>:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>elixirc math.ex
+</code></pre></div>
+<p>This will generate a file named <code>Elixir.Math.beam</code> containing the bytecode for the defined module. If we start <code>iex</code> again, our module definition will be available (provided that <code>iex</code> is started in the same directory the bytecode file is in):</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">Math</span><span class="p">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">3</span>
+</code></pre></div>
+<p>Elixir projects are usually organized into three directories:</p>
+
+<ul>
+<li>ebin - contains the compiled bytecode</li>
+<li>lib - contains elixir code (usually <code>.ex</code> files)</li>
+<li>test - contains tests (usually <code>.exs</code> files)</li>
+</ul>
+
+<p>When working on actual projects, the build tool called <code>mix</code> will be responsible for compiling and setting up the proper paths for you. For learning purposes, Elixir also supports a scripted mode which is more flexible and does not generate any compiled artifacts.</p>
+
+<h2 id="scripted-mode">Scripted mode</h2>
+
+<p>In addition to the Elixir file extension <code>.ex</code>, Elixir also supports <code>.exs</code> files for scripting. Elixir treats both files exactly the same way, the only difference is in intention. <code>.ex</code> files are meant to be compiled while <code>.exs</code> files are used for scripting, without the need for compilation. For instance, we can create a file called <code>math.exs</code>:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Math</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="nc">Math</span><span class="p">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<p>And execute it as:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>elixir math.exs
+</code></pre></div>
+<p>The file will be compiled in memory and executed, printing &quot;3&quot; as the result. No bytecode file will be created. In the following examples, we recommend you write your code into script files and execute them as shown above.</p>
+
+<h2 id="named-functions">Named functions</h2>
+
+<p>Inside a module, we can define functions with <code>def/2</code> and private functions with <code>defp/2</code>. A function defined with <code>def/2</code> can be invoked from other modules while a private function can only be invoked locally.</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Math</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">do_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kd">defp</span> <span class="n">do_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nc">Math</span><span class="p">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>    <span class="c1">#=&gt; 3</span>
+<span class="nc">Math</span><span class="p">.</span><span class="n">do_sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1">#=&gt; ** (UndefinedFunctionError)</span>
+</code></pre></div>
+<p>Function declarations also support guards and multiple clauses. If a function has several clauses, Elixir will try each clause until it finds one that matches. Here is an implementation of a function that checks if the given number is zero or not:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Math</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">zero?</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">true</span>
+  <span class="k">end</span>
+
+  <span class="kd">def</span> <span class="n">zero?</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_number</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">false</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nc">Math</span><span class="p">.</span><span class="n">zero?</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1">#=&gt; true</span>
+<span class="nc">Math</span><span class="p">.</span><span class="n">zero?</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1">#=&gt; false</span>
+
+<span class="nc">Math</span><span class="p">.</span><span class="n">zero?</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="c1">#=&gt; ** (FunctionClauseError)</span>
+</code></pre></div>
+<p>Giving an argument that does not match any of the clauses raises an error.</p>
+
+<h2 id="function-capturing">Function capturing</h2>
+
+<p>Throughout this tutorial, we have been using the notation <code>name/arity</code> to refer to functions. It happens that this notation can actually be used to retrieve a named function as a function type. Let&#39;s start <code>iex</code> and run the <code>math.exs</code> file defined above:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>iex math.exs
+</code></pre></div><div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">Math</span><span class="p">.</span><span class="n">zero?</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">true</span>
+<span class="gp">iex&gt; </span><span class="n">fun</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nc">Math</span><span class="p">.</span><span class="n">zero?</span><span class="o">/</span><span class="mi">1</span>
+<span class="go">&amp;Math.zero?/1</span>
+<span class="gp">iex&gt; </span><span class="n">is_function</span> <span class="n">fun</span>
+<span class="go">true</span>
+<span class="gp">iex&gt; </span><span class="n">fun</span><span class="p">.(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">true</span>
+</code></pre></div>
+<p>Local or imported functions, like <code>is_function/1</code>, can be captured without the module:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="o">&amp;</span><span class="n">is_function</span><span class="o">/</span><span class="mi">1</span>
+<span class="go">&amp;:erlang.is_function/1</span>
+<span class="gp">iex&gt; </span><span class="p">(</span><span class="o">&amp;</span><span class="n">is_function</span><span class="o">/</span><span class="mi">1</span><span class="p">).(</span><span class="n">fun</span><span class="p">)</span>
+<span class="go">true</span>
+</code></pre></div>
+<p>Note the capture syntax can also be used as a shortcut for creating functions:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="n">fun</span> <span class="p">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="ni">&amp;1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">#Function&lt;6.71889879/1 in :erl_eval.expr/5&gt;</span>
+<span class="gp">iex&gt; </span><span class="n">fun</span><span class="p">.(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">2</span>
+</code></pre></div>
+<p>The <code>&amp;1</code> represents the first argument passed into the function. <code>&amp;(&amp;1+1)</code> above is exactly the same as <code>fn x -&gt; x + 1 end</code>. The syntax above is useful for short function definitions.</p>
+
+<p>In the same fashion if you want to call a function from a module, you can do <code>&amp;Module.function()</code>:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="n">fun</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nc">List</span><span class="p">.</span><span class="n">flatten</span><span class="p">(</span><span class="ni">&amp;1</span><span class="p">,</span> <span class="ni">&amp;2</span><span class="p">)</span>
+<span class="go">&amp;List.flatten/2</span>
+<span class="gp">iex&gt; </span><span class="n">fun</span><span class="p">.([</span><span class="mi">1</span><span class="p">,</span> <span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">]],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">[1, 2, 3, 4, 5]</span>
+</code></pre></div>
+<p><code>&amp;List.flatten(&amp;1, &amp;2)</code> is the same as writing <code>fn(list, tail) -&gt; List.flatten(list, tail) end</code>. You can read more about the capture operator <code>&amp;</code> in <a href="/docs/stable/elixir/Kernel.SpecialForms.html#&amp;/1">the <code>Kernel.SpecialForms</code> documentation</a>.</p>
+
+<h2 id="default-arguments">Default arguments</h2>
+
+<p>Named functions in Elixir also support default arguments:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Concat</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sep</span> <span class="p">\\</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">a</span> <span class="o">&lt;&gt;</span> <span class="n">sep</span> <span class="o">&lt;&gt;</span> <span class="n">b</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="nc">Concat</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">)</span>      <span class="c1">#=&gt; Hello world</span>
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="nc">Concat</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="c1">#=&gt; Hello_world</span>
+</code></pre></div>
+<p>Any expression is allowed to serve as a default value, but it won&#39;t be evaluated during the function definition; it will simply be stored for later use. Every time the function is invoked and any of its default values have to be used, the expression for that default value will be evaluated:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">DefaultTest</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">dowork</span><span class="p">(</span><span class="n">x</span> <span class="p">\\</span> <span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="s2">&quot;hello&quot;</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">x</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div><div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">DefaultTest</span><span class="p">.</span><span class="n">dowork</span>
+<span class="go">hello</span>
+<span class="go">:ok</span>
+<span class="gp">iex&gt; </span><span class="nc">DefaultTest</span><span class="p">.</span><span class="n">dowork</span> <span class="mi">123</span>
+<span class="go">123</span>
+<span class="gp">iex&gt; </span><span class="nc">DefaultTest</span><span class="p">.</span><span class="n">dowork</span>
+<span class="go">hello</span>
+<span class="go">:ok</span>
+</code></pre></div>
+<p>If a function with default values has multiple clauses, it is recommended to create a function head (without an actual body), just for declaring defaults:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Concat</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">\\</span> <span class="no">nil</span><span class="p">,</span> <span class="n">sep</span> <span class="p">\\</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+  <span class="kd">def</span> <span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_sep</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_nil</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">a</span>
+  <span class="k">end</span>
+
+  <span class="kd">def</span> <span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sep</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">a</span> <span class="o">&lt;&gt;</span> <span class="n">sep</span> <span class="o">&lt;&gt;</span> <span class="n">b</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="nc">Concat</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">)</span>      <span class="c1">#=&gt; Hello world</span>
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="nc">Concat</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="c1">#=&gt; Hello_world</span>
+<span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="nc">Concat</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">)</span>               <span class="c1">#=&gt; Hello</span>
+</code></pre></div>
+<p>When using default values, one must be careful to avoid overlapping function definitions. Consider the following example:</p>
+<div class="highlight"><pre><code class="language-elixir" data-lang="elixir"><span class="kd">defmodule</span> <span class="nc">Concat</span> <span class="k">do</span>
+  <span class="kd">def</span> <span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">do</span>
+    <span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="s2">&quot;***First join&quot;</span>
+    <span class="n">a</span> <span class="o">&lt;&gt;</span> <span class="n">b</span>
+  <span class="k">end</span>
+
+  <span class="kd">def</span> <span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sep</span> <span class="p">\\</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="k">do</span>
+    <span class="nc">IO</span><span class="p">.</span><span class="n">puts</span> <span class="s2">&quot;***Second join&quot;</span>
+    <span class="n">a</span> <span class="o">&lt;&gt;</span> <span class="n">sep</span> <span class="o">&lt;&gt;</span> <span class="n">b</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>
+<p>If we save the code above in a file named &quot;concat.ex&quot; and compile it, Elixir will emit the following warning:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">concat.ex:7: this clause cannot match because a previous clause at line 2 always matches
+</code></pre></div>
+<p>The compiler is telling us that invoking the <code>join</code> function with two arguments will always choose the first definition of <code>join</code> whereas the second one will only be invoked when three arguments are passed:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>iex concat.exs
+</code></pre></div><div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">Concat</span><span class="p">.</span><span class="n">join</span> <span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span>
+<span class="go">***First join</span>
+<span class="go">&quot;Helloworld&quot;</span>
+</code></pre></div><div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">Concat</span><span class="p">.</span><span class="n">join</span> <span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span>
+<span class="go">***Second join</span>
+<span class="go">&quot;Hello_world&quot;</span>
+</code></pre></div>
+<p>This finishes our short introduction to modules. In the next chapters, we will learn how to use named functions for recursion, explore Elixir lexical directives that can be used for importing functions from other modules and discuss module attributes.</p>
+
+  </article><!-- .hfeed -->
+
+  
+  
+  
+  
+  
+
+  
+  
+    
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+          <div class="pagination loop-pagination">
+            
+              <a href="/getting-started/maps-and-dicts.html" class="previous page-numbers spec" title="Keywords, maps and dicts">&larr; Previous</a>
+            
+              <a class="page-numbers spec" href="#container">Top</a>
+            
+              
+              <a href="/getting-started/recursion.html" class="previous page-numbers spec" title="Recursion">Next &rarr;</a>
+            
+          </div>
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+    
+  
+    
+  
+    
+  
+
+</div><!-- #content -->
+
+      </div><!-- #main -->
+
+      <div class="clear"></div>
+
+      <div id="copyright">
+        &copy; 2012-2015 <a href="http://plataformatec.com.br/">Plataformatec</a>. All rights reserved.
+      </div>
+    </div><!-- .wrap -->
+  </div><!-- #container -->
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8268430-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/js/toc/toc.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.toc').toc({
+        title: '',
+        listType: 'ol',
+        minimumHeaders: 2,
+        headers: 'h2, h3, h4, h5, h6',
+        linkHere: true,
+        linkHereTitle: 'Link here',
+        backToTop: true,
+        backToTopId: 'toc',
+        backToTopTitle: 'Back to Table of Contents',
+      });
+      $('.jekyll-toc-header a.jekyll-toc-link-here span.jekyll-toc-icon').addClass('icon icon-link');
+      $('.jekyll-toc-header a.jekyll-toc-back-to-top span.jekyll-toc-icon').addClass('icon icon-chevron-up');
+    });
+
+  </script>
+</body>
+</html>

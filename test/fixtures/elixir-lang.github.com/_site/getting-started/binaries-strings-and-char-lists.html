@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>Binaries, strings and char lists - Elixir</title>
+  <link href="http://feeds.feedburner.com/ElixirLang" rel="alternate" title="Elixir's Blog" type="application/atom+xml" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
+  <link rel="stylesheet" href="/js/icons/style.css">
+  <!--[if lt IE 8]><!-->
+  <link rel="stylesheet" href="/js/icons/ie7/ie7.css">
+  <!--<![endif]-->
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" id="font-bitter-css" href="http://fonts.googleapis.com/css?family=Bitter&amp;ver=1" type="text/css" media="screen" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+</head>
+
+<body class="getting-started">
+  <div id="container">
+    <div class="wrap">
+    <div id="header">
+      <div id="branding">
+        <h1 id="site-title">
+          <a href="/" title="Elixir" rel="Home">
+            <img class="logo" src="/images/logo/logo.png" alt="Elixir Logo" />
+          </a>
+        </h1>
+      </div>
+
+      <div id="menu-primary" class="menu-container">
+        <div class="menu">
+          <ul id="menu-primary-items">
+            <li class="menu-item home"><a class="spec" href="/">Home</a></li>
+            <li class="menu-item install"><a class="spec" href="/install.html">Install</a></li>
+            <li class="menu-item getting-started"><a class="spec" href="/getting-started/introduction.html">Getting Started</a></li>
+            <li class="menu-item learning"><a class="spec" href="/learning.html">Learning</a></li>
+            <li class="menu-item docs"><a class="spec" href="/docs.html">Docs</a></li>
+            <li class="menu-item blog"><a class="spec" href="/blog/">Blog</a></li>
+            <li class="menu-item packages"><a class="spec" href="http://hex.pm/">Packages</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+    </div>
+
+    <div id="main">
+
+
+<div id="sidebar-primary" class="sidebar">
+  <div class="widget news">
+  <h3>
+    News: <a href="/blog/2014/09/18/elixir-v1-0-0-released/">Elixir v1.0 released</a>
+  </h3>
+</div>
+
+<div class="widget search">
+  <form method="get" class="search-form" action="http://www.google.com/search">
+		<div>
+			<input class="search-text" type="text" name="q" placeholder="Search..." id="searchfield">
+			<input type="hidden" name="sitesearch" value="elixir-lang.org">
+			<input class="search-submit button" name="submit" type="submit" value="Search">
+		</div>
+	</form>
+</div>
+
+  
+  
+    <div class="widget">
+     <h3 class="widget-title">Getting Started</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/introduction.html" title="Introduction">Introduction</a></li>
+        
+          <li><a class="spec" href="/getting-started/basic-types.html" title="Basic types">Basic types</a></li>
+        
+          <li><a class="spec" href="/getting-started/basic-operators.html" title="Basic operators">Basic operators</a></li>
+        
+          <li><a class="spec" href="/getting-started/pattern-matching.html" title="Pattern matching">Pattern matching</a></li>
+        
+          <li><a class="spec" href="/getting-started/case-cond-and-if.html" title="case, cond and if">case, cond and if</a></li>
+        
+          <li><a class="spec" href="/getting-started/binaries-strings-and-char-lists.html" title="Binaries, strings and char lists">Binaries, strings and char lists</a></li>
+        
+          <li><a class="spec" href="/getting-started/maps-and-dicts.html" title="Keywords, maps and dicts">Keywords, maps and dicts</a></li>
+        
+          <li><a class="spec" href="/getting-started/modules.html" title="Modules">Modules</a></li>
+        
+          <li><a class="spec" href="/getting-started/recursion.html" title="Recursion">Recursion</a></li>
+        
+          <li><a class="spec" href="/getting-started/enumerables-and-streams.html" title="Enumerables and streams">Enumerables and streams</a></li>
+        
+          <li><a class="spec" href="/getting-started/processes.html" title="Processes">Processes</a></li>
+        
+          <li><a class="spec" href="/getting-started/io-and-the-file-system.html" title="IO and the file system">IO and the file system</a></li>
+        
+          <li><a class="spec" href="/getting-started/alias-require-and-import.html" title="alias, require and import">alias, require and import</a></li>
+        
+          <li><a class="spec" href="/getting-started/module-attributes.html" title="Module attributes">Module attributes</a></li>
+        
+          <li><a class="spec" href="/getting-started/structs.html" title="Structs">Structs</a></li>
+        
+          <li><a class="spec" href="/getting-started/protocols.html" title="Protocols">Protocols</a></li>
+        
+          <li><a class="spec" href="/getting-started/comprehensions.html" title="Comprehensions">Comprehensions</a></li>
+        
+          <li><a class="spec" href="/getting-started/sigils.html" title="Sigils">Sigils</a></li>
+        
+          <li><a class="spec" href="/getting-started/try-catch-and-rescue.html" title="try, catch and rescue">try, catch and rescue</a></li>
+        
+          <li><a class="spec" href="/getting-started/typespecs-and-behaviours.html" title="Typespecs and behaviours">Typespecs and behaviours</a></li>
+        
+          <li><a class="spec" href="/getting-started/where-to-go-next.html" title="Where to go next">Where to go next</a></li>
+        
+      </ol>
+    </div>
+  
+    <div class="widget">
+     <h3 class="widget-title">Mix and OTP</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/introduction-to-mix.html" title="Introduction to Mix">Introduction to Mix</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/agent.html" title="Agent">Agent</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/genserver.html" title="GenServer">GenServer</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/genevent.html" title="GenEvent">GenEvent</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/supervisor-and-application.html" title="Supervisor and Application">Supervisor and Application</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/ets.html" title="ETS">ETS</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/dependencies-and-umbrella-apps.html" title="Dependencies and umbrella apps">Dependencies and umbrella apps</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/task-and-gen-tcp.html" title="Task and gen-tcp">Task and gen-tcp</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/docs-tests-and-pipelines.html" title="Docs, tests and pipelines">Docs, tests and pipelines</a></li>
+        
+          <li><a class="spec" href="/getting-started/mix-otp/distributed-tasks-and-configuration.html" title="Distributed tasks and configuration">Distributed tasks and configuration</a></li>
+        
+      </ol>
+    </div>
+  
+    <div class="widget">
+     <h3 class="widget-title">Meta-programming in Elixir</h3>
+      <ol>
+        
+          <li><a class="spec" href="/getting-started/meta/quote-and-unquote.html" title="Quote and unquote">Quote and unquote</a></li>
+        
+          <li><a class="spec" href="/getting-started/meta/macros.html" title="Macros">Macros</a></li>
+        
+          <li><a class="spec" href="/getting-started/meta/domain-specific-languages.html" title="Domain Specific Languages">Domain Specific Languages</a></li>
+        
+      </ol>
+    </div>
+  
+
+  <div id="sponsors" class="widget">
+  <h3 class="widget-title">Sponsors</h3>
+  <ul>
+    <li class="image"><a href="http://plataformatec.com.br" title="Plataformatec"><img src="/images/logo/plataformatec.png" alt="Plataformatec Logo" width="190" height="74" /></a></li>
+  </ul>
+</div>
+</div>
+
+<div id="content">
+  <article>
+    <h1 id="binaries,-strings-and-char-lists">Binaries, strings and char lists</h1>
+
+<div id="toc" class="toc"></div>
+
+<p>In &quot;Basic types&quot;, we learned about strings and used the <code>is_binary/1</code> function for checks:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="n">string</span> <span class="p">=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="go">&quot;hello&quot;</span>
+<span class="gp">iex&gt; </span><span class="n">is_binary</span> <span class="n">string</span>
+<span class="go">true</span>
+</code></pre></div>
+<p>In this chapter, we will understand what binaries are, how they associate with strings, and what a single-quoted value, <code>&#39;like this&#39;</code>, means in Elixir.</p>
+
+<h2 id="utf-8-and-unicode">UTF-8 and Unicode</h2>
+
+<p>A string is a UTF-8 encoded binary. In order to understand exactly what we mean by that, we need to understand the difference between bytes and code points.</p>
+
+<p>The Unicode standard assigns code points to many of the characters we know. For example, the letter <code>a</code> has code point <code>97</code> while the letter <code>ł</code> has code point <code>322</code>. When writing the string <code>&quot;hełło&quot;</code> to disk, we need to convert this code point to bytes. If we adopted a rule that said one byte represents one code point, we wouldn&#39;t be able to write <code>&quot;hełło&quot;</code>, because it uses the code point <code>322</code> for <code>ł</code>, and one byte can only represent a number from <code>0</code> to <code>255</code>. But of course, given you can actually read <code>&quot;hełło&quot;</code> on your screen, it must be represented <em>somehow</em>. That&#39;s where encodings come in.</p>
+
+<p>When representing code points in bytes, we need to encode them somehow. Elixir chose the UTF-8 encoding as its main and default encoding. When we say a string is a UTF-8 encoded binary, we mean a string is a bunch of bytes organized in a way to represent certain code points, as specified by the UTF-8 encoding.</p>
+
+<p>Since we have code points like <code>ł</code> assigned to the number <code>322</code>, we actually need more than one byte to represent it. That&#39;s why we see a difference when we calculate the <code>byte_size/1</code> of a string compared to its <code>String.length/1</code>:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="n">string</span> <span class="p">=</span> <span class="s2">&quot;hełło&quot;</span>
+<span class="go">&quot;hełło&quot;</span>
+<span class="gp">iex&gt; </span><span class="n">byte_size</span> <span class="n">string</span>
+<span class="go">7</span>
+<span class="gp">iex&gt; </span><span class="nc">String</span><span class="p">.</span><span class="n">length</span> <span class="n">string</span>
+<span class="go">5</span>
+</code></pre></div>
+<blockquote>
+<p>Note: if you are running on Windows, there is a chance your terminal does not use UTF-8 by default. You can change the encoding of your current session by running <code>chcp 65001</code> before entering iex.</p>
+</blockquote>
+
+<p>UTF-8 requires one byte to represent the code points <code>h</code>, <code>e</code> and <code>o</code>, but two bytes to represent <code>ł</code>. In Elixir, you can get a code point&#39;s value by using <code>?</code>:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="sc">?a</span>
+<span class="go">97</span>
+<span class="gp">iex&gt; </span><span class="sc">?ł</span>
+<span class="go">322</span>
+</code></pre></div>
+<p>You can also use the functions in <a href="/docs/stable/elixir/String.html">the <code>String</code> module</a> to split a string in its code points:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">String</span><span class="p">.</span><span class="n">codepoints</span><span class="p">(</span><span class="s2">&quot;hełło&quot;</span><span class="p">)</span>
+<span class="go">[&quot;h&quot;, &quot;e&quot;, &quot;ł&quot;, &quot;ł&quot;, &quot;o&quot;]</span>
+</code></pre></div>
+<p>You will see that Elixir has excellent support for working with strings. It also supports many of the Unicode operations. In fact, Elixir passes all the tests showcased in the article <a href="http://mortoray.com/2013/11/27/the-string-type-is-broken/">&quot;The string type is broken&quot;</a>.</p>
+
+<p>However, strings are just part of the story. If a string is a binary, and we have used the <code>is_binary/1</code> function, Elixir must have an underlying type empowering strings. And it does. Let&#39;s talk about binaries!</p>
+
+<h2 id="binaries-(and-bitstrings)">Binaries (and bitstrings)</h2>
+
+<p>In Elixir, you can define a binary using <code>&lt;&lt;&gt;&gt;</code>:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;0, 1, 2, 3&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="n">byte_size</span> <span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">&gt;&gt;</span>
+<span class="go">4</span>
+</code></pre></div>
+<p>A binary is just a sequence of bytes. Of course, those bytes can be organized in any way, even in a sequence that does not make them a valid string:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="nc">String</span><span class="p">.</span><span class="n">valid?</span><span class="p">(&lt;&lt;</span><span class="mi">239</span><span class="p">,</span> <span class="mi">191</span><span class="p">,</span> <span class="mi">191</span><span class="p">&gt;&gt;)</span>
+<span class="go">false</span>
+</code></pre></div>
+<p>The string concatenation operation is actually a binary concatenation operator:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">&gt;&gt;</span> <span class="o">&lt;&gt;</span> <span class="p">&lt;&lt;</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;0, 1, 2, 3&gt;&gt;</span>
+</code></pre></div>
+<p>A common trick in Elixir is to concatenate the null byte <code>&lt;&lt;0&gt;&gt;</code> to a string to see its inner binary representation:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="s2">&quot;hełło&quot;</span> <span class="o">&lt;&gt;</span> <span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;104, 101, 197, 130, 197, 130, 111, 0&gt;&gt;</span>
+</code></pre></div>
+<p>Each number given to a binary is meant to represent a byte and therefore must go up to 255. Binaries allow modifiers to be given to store numbers bigger than 255 or to convert a code point to its utf8 representation:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">255</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;255&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">256</span><span class="p">&gt;&gt;</span> <span class="c1"># truncated</span>
+<span class="go">&lt;&lt;0&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">256</span> <span class="p">::</span> <span class="n">size</span><span class="p">(</span><span class="mi">16</span><span class="p">)&gt;&gt;</span> <span class="c1"># use 16 bits (2 bytes) to store the number</span>
+<span class="go">&lt;&lt;1, 0&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">256</span> <span class="p">::</span> <span class="n">utf8</span><span class="p">&gt;&gt;</span> <span class="c1"># the number is a code point</span>
+<span class="go">&quot;Ā&quot;</span>
+<span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">256</span> <span class="p">::</span> <span class="n">utf8</span><span class="p">,</span> <span class="mi">0</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;196, 128, 0&gt;&gt;</span>
+</code></pre></div>
+<p>If a byte has 8 bits, what happens if we pass a size of 1 bit?</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">1</span> <span class="p">::</span> <span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)&gt;&gt;</span>
+<span class="go">&lt;&lt;1::size(1)&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">2</span> <span class="p">::</span> <span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)&gt;&gt;</span> <span class="c1"># truncated</span>
+<span class="go">&lt;&lt;0::size(1)&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="n">is_binary</span><span class="p">(&lt;&lt;</span> <span class="mi">1</span> <span class="p">::</span> <span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)&gt;&gt;)</span>
+<span class="go">false</span>
+<span class="gp">iex&gt; </span><span class="n">is_bitstring</span><span class="p">(&lt;&lt;</span> <span class="mi">1</span> <span class="p">::</span> <span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)&gt;&gt;)</span>
+<span class="go">true</span>
+<span class="gp">iex&gt; </span><span class="n">bit_size</span><span class="p">(&lt;&lt;</span> <span class="mi">1</span> <span class="p">::</span> <span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)&gt;&gt;)</span>
+<span class="go">1</span>
+</code></pre></div>
+<p>The value is no longer a binary, but a bitstring -- just a bunch of bits! So a binary is a bitstring where the number of bits is divisible by 8!</p>
+
+<p>We can also pattern match on binaries / bitstrings:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">&gt;&gt;</span> <span class="p">=</span> <span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;0, 1, 2&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="n">x</span>
+<span class="go">2</span>
+<span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">&gt;&gt;</span> <span class="p">=</span> <span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">&gt;&gt;</span>
+<span class="gr">** (MatchError) no match of right hand side value: &lt;&lt;0, 1, 2, 3&gt;&gt;</span>
+</code></pre></div>
+<p>Note each entry in the binary is expected to match exactly 8 bits. However, we can match on the rest of the binary modifier:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span> <span class="p">::</span> <span class="n">binary</span><span class="p">&gt;&gt;</span> <span class="p">=</span> <span class="p">&lt;&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">&gt;&gt;</span>
+<span class="go">&lt;&lt;0, 1, 2, 3&gt;&gt;</span>
+<span class="gp">iex&gt; </span><span class="n">x</span>
+<span class="go">&lt;&lt;2, 3&gt;&gt;</span>
+</code></pre></div>
+<p>The pattern above only works if the binary is at the end of <code>&lt;&lt;&gt;&gt;</code>. Similar results can be achieved with the string concatenation operator <code>&lt;&gt;</code>:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="s2">&quot;he&quot;</span> <span class="o">&lt;&gt;</span> <span class="n">rest</span> <span class="p">=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="go">&quot;hello&quot;</span>
+<span class="gp">iex&gt; </span><span class="n">rest</span>
+<span class="go">&quot;llo&quot;</span>
+</code></pre></div>
+<p>This finishes our tour of bitstrings, binaries and strings. A string is a UTF-8 encoded binary, and a binary is a bitstring where the number of bits is divisible by 8. Although this shows the flexibility Elixir provides to work with bits and bytes, 99% of the time you will be working with binaries and using the <code>is_binary/1</code> and <code>byte_size/1</code> functions.</p>
+
+<h2 id="char-lists">Char lists</h2>
+
+<p>A char list is nothing more than a list of characters:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="s1">&#39;hełło&#39;</span>
+<span class="go">[104, 101, 322, 322, 111]</span>
+<span class="gp">iex&gt; </span><span class="n">is_list</span> <span class="s1">&#39;hełło&#39;</span>
+<span class="go">true</span>
+<span class="gp">iex&gt; </span><span class="s1">&#39;hello&#39;</span>
+<span class="go">&#39;hello&#39;</span>
+</code></pre></div>
+<p>You can see that, instead of containing bytes, a char list contains the code points of the characters between single-quotes (note that iex will only output code points if any of the chars is outside the ASCII range). So while double-quotes represent a string (i.e. a binary), single-quotes represents a char list (i.e. a list).</p>
+
+<p>In practice, char lists are used mostly when interfacing with Erlang, in particular old libraries that do not accept binaries as arguments. You can convert a char list to a string and back by using the <code>to_string/1</code> and <code>to_char_list/1</code> functions:</p>
+<div class="highlight"><pre><code class="language-iex" data-lang="iex"><span class="gp">iex&gt; </span><span class="n">to_char_list</span> <span class="s2">&quot;hełło&quot;</span>
+<span class="go">[104, 101, 322, 322, 111]</span>
+<span class="gp">iex&gt; </span><span class="n">to_string</span> <span class="s1">&#39;hełło&#39;</span>
+<span class="go">&quot;hełło&quot;</span>
+<span class="gp">iex&gt; </span><span class="n">to_string</span> <span class="ss">:hello</span>
+<span class="go">&quot;hello&quot;</span>
+<span class="gp">iex&gt; </span><span class="n">to_string</span> <span class="mi">1</span>
+<span class="go">&quot;1&quot;</span>
+</code></pre></div>
+<p>Note that those functions are polymorphic. They not only convert char lists to strings, but also integers to strings, atoms to strings, and so on.</p>
+
+<p>With binaries, strings, and char lists out of the way, it is time to talk about key-value data structures.</p>
+
+  </article><!-- .hfeed -->
+
+  
+  
+  
+  
+  
+
+  
+  
+    
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+          <div class="pagination loop-pagination">
+            
+              <a href="/getting-started/case-cond-and-if.html" class="previous page-numbers spec" title="case, cond and if">&larr; Previous</a>
+            
+              <a class="page-numbers spec" href="#container">Top</a>
+            
+              
+              <a href="/getting-started/maps-and-dicts.html" class="previous page-numbers spec" title="Keywords, maps and dicts">Next &rarr;</a>
+            
+          </div>
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+    
+  
+    
+  
+    
+  
+
+</div><!-- #content -->
+
+      </div><!-- #main -->
+
+      <div class="clear"></div>
+
+      <div id="copyright">
+        &copy; 2012-2015 <a href="http://plataformatec.com.br/">Plataformatec</a>. All rights reserved.
+      </div>
+    </div><!-- .wrap -->
+  </div><!-- #container -->
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8268430-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/js/toc/toc.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.toc').toc({
+        title: '',
+        listType: 'ol',
+        minimumHeaders: 2,
+        headers: 'h2, h3, h4, h5, h6',
+        linkHere: true,
+        linkHereTitle: 'Link here',
+        backToTop: true,
+        backToTopId: 'toc',
+        backToTopTitle: 'Back to Table of Contents',
+      });
+      $('.jekyll-toc-header a.jekyll-toc-link-here span.jekyll-toc-icon').addClass('icon icon-link');
+      $('.jekyll-toc-header a.jekyll-toc-back-to-top span.jekyll-toc-icon').addClass('icon icon-chevron-up');
+    });
+
+  </script>
+</body>
+</html>
