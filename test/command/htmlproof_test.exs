@@ -5,22 +5,6 @@ defmodule Command.HtmlproofTest do
   alias Command.Htmlproof
   doctest Command.Htmlproof
 
-  setup do
-    text = File.read!("./sample.log")
-
-    rules = [
-      accept: [
-        ~r/\d+ /,
-      ],
-      reject: [
-        ~r/$\s+^/,
-        "",
-        ~r/Ran on \d+ files!/,
-      ],
-    ]
-    {:ok, text: text, rules: rules, }
-  end
-
   test "discard_favicons_on_redirects" do
     text = """
 - ./_site/getting_started/mix-otp/task-and-gen-tcp.html

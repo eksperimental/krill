@@ -50,22 +50,14 @@ defmodule Krill.ProcessTest do
   end
 
   test "spawn_shell", %{state: state, expected_out: expected_out, expected_err: expected_err, } do
-    #Logger.debug("PID: #{inspect self}")
-    #process = Porcelain.spawn_shell(state.command, [out: {:send, self}, err: {:send, self}])
     {:ok, process} = exec(self, state.command, :spawn_shell)
-    #Logger.debug("process: #{inspect process}")
     %Porcelain.Process{pid: pid} = process
     _state_handled = handle_output(self, pid, state)
-    #Logger.debug("state_handled: #{inspect state_handled}")
 
-    #Porcelain.Process.await(process, :infinity)
     receive do
       {:ok, state} ->
         state = state
     end
-
-    #Logger.debug("state: #{inspect state}")
-    #Logger.debug("result: #{inspect state.result}")
 
     state = Map.put(state, :process, process)
     assert state.stdout_raw == expected_out
@@ -73,22 +65,15 @@ defmodule Krill.ProcessTest do
   end
 
   test "shell", %{state: state,  expected_out: expected_out, expected_err: expected_err, } do
-    #Logger.debug("PID: #{inspect self}")
-
-    #state = Krill.Process.run(state)
     {:ok, result} = exec(self, state.command, :shell)
-    #Logger.debug("result: #{inspect result}")
-    #Logger.debug("result: #{inspect result.err}")
     state = Map.merge( state, %{
       result: result,
       stdout_raw: result.out,
       stderr_raw: result.err,
       status_raw: result.status,
     })
-    #Logger.debug inspect( Map.delete(state, :result) )
     assert state.stdout_raw == expected_out
     assert state.stderr_raw == expected_err
   end
-
 
 end

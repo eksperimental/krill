@@ -19,11 +19,19 @@ defmodule Krill do
 
       @behaviour Krill
 
+      def get_module do
+        #quote do: __MODULE__
+        __MODULE__
+      end
+
       defmodule Command do
         defstruct [
           # configurable
+          title: nil,
+          module: nil,
           command: nil,
           command_name: nil,
+          timeout: 5000,
           message_ok: "OK: Everything is alright.",
           message_error: "ERROR: Errors have been found.",
           accept: %{stdout: nil, stderr: nil},
@@ -45,22 +53,30 @@ defmodule Krill do
       def process_std(state), do: state
 
       def new(conf \\ nil) when is_nil(conf) when is_map(conf) do
-        if is_nil(conf), do: conf = config()
+        result = Map.merge(%Command{}, config())
+        if conf,
+          do: result = Map.merge(result, conf)
 
-        unless Enum.empty?(conf) do
-          Map.merge(%Command{}, conf)
-        else
-          %Command{}
-        end
+        Map.put(result, :module, __MODULE__)
+        |> Map.put(:name, {:global, __MODULE__})
       end
 
-      def start(_type, _args), do: run()
+      #def start(_type, _args), do: run()
+      def start(_type, _args), do: nil
 
-      def run() do
-        state = new()
-        IO.puts "Running #{state.command_name}"
+      def run(conf \\ nil) do
+        #IO.inspect(conf)
+        state = new(conf)
+        #IO.puts("RUN STATE")
+
+        #check basic information is provided, such as command
+        if empty?(state.command),
+          do: exit({:shutdown, "command not provided", state})
+
+        if state.title,
+          do: IO.puts "Running: #{state.title}"
+
         IO.puts "$ #{state.command}\n"
-
         {:ok, state} = Krill.Process.run(state)
         
         state = state

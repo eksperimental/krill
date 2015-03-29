@@ -4,10 +4,10 @@ defmodule Command.Htmlproof do
   def config do
     command_name = "htmlproof"  
     %{ 
-      name: {:global, __MODULE__},
+      title: "Htmlproof - Validate site",
       command_name: command_name,
       #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
-      command: "htmlproof ./test/fixtures/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
+      #command: "htmlproof ./test/fixtures/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
       reject: [
         stdout: [
           ~r/Running \[.*\] checks on/,
@@ -23,8 +23,8 @@ defmodule Command.Htmlproof do
           ~r/internally linking to \/docs\/.*, which does not exist/,
           ~r/trying to find hash of \/docs\/.*, but .* does not exist/,
 
-          "internal script toc.js",
-          "no favicon specified",
+          #"internal script toc.js",
+          #"no favicon specified",
         ]
       ],
       message_ok: "OK: #{command_name} - Everything is alright.",

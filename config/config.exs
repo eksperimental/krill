@@ -4,7 +4,21 @@ use Mix.Config
 
 config :porcelain, driver: Porcelain.Driver.Goon
 
-config :krill, commands: ["sample", "htmlproof"]
+config :krill, config: [
+  sample: %{
+    title: "Sample Command",
+    command_name: "echo.sh",
+    command: "./test/fixtures/echo.sh",
+    timeout: 1000, 
+    },
+  htmlproof: %{
+    title: "Validate site with Htmlproof",
+    command_name: "htmlproof",
+    command: "htmlproof ./test/fixtures/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
+    #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
+    timeout: 1000 * 60 * 15, # 15mins
+    },
+]
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

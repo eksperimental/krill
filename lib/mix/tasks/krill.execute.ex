@@ -1,53 +1,36 @@
 defmodule Mix.Tasks.Krill.Execute do
-  #use Mix.Task
-  import Mix.Krill
   require Logger
 
-  #@shortdoc "Create the storage for the repo"
-
-  @moduledoc """
-  Create the storage for the repository.
-
-  ## Examples
-
-      mix krill.execute
-      mix krill.execute -r Custom.Repo
-
-  ## Command line options
-
-    * `-r`, `--repo` - the repo to create (defaults to `YourApp.Repo`)
-    * `--no-start` - do not start applications
-
-  """
-
   @doc false
-  def run(module_names) do
-    case module_names do
+  def run(commands) do
+    commands = case commands do
       [] ->
-        module_names = Application.get_env(:krill, :commands)
+        Application.get_env(:krill, :config) |> Keyword.keys
 
       [":all"] ->
-        module_names = list_commands()
+        Mix.Krill.list_commands()
 
       _ ->
-        nil
+        Enum.map( commands, &(String.to_atom(&1)) )
     end
 
     cond do
-      is_list(module_names) and length(module_names) > 0 -> 
+      is_list(commands) and length(commands) > 0 -> 
         Mix.Task.run "app.start"
-        modules = Enum.map(module_names, &(Module.concat([Command, String.capitalize(&1)])))
-        
-        Enum.map(modules, fn(module) ->
-          Task.async(module, :run, [])
+        #Logger.debug(inspect commands)
+        Enum.map(commands, fn(command) ->
+          conf = Mix.Krill.merge_config(command)
+          {Task.async(conf.module, :run, [Mix.Krill.local_config(command)]), conf.timeout}
         end)
-        |> Enum.each(fn(task) ->
-          Task.await(task, :infinity)
+        |> Enum.each(fn({task, timeout}) ->
+          Task.await(task, timeout)
         end)
 
       true ->
-        exit({:shotdown, "No module_names provided"})
+        exit({:shutdown, "No module_names provided"})
     end
+
+    :ok
   end
   
 end

@@ -4,7 +4,7 @@ defmodule Krill.ParserTest do
   doctest Krill.Parser
 
   setup do
-    text = File.read!("./sample.log")
+    text = File.read!("./test/fixtures/sample.log")
 
     rules = [
       accept: [

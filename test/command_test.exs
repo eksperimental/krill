@@ -5,8 +5,15 @@ defmodule Krill.CommandTest do
   require Logger
   import ExUnit.CaptureIO  
 
-  test "sample" do
-    {:ok, state} = Command.Sample.run
+  setup do
+    conf  = Mix.Krill.local_config(:sample)
+
+    {:ok, conf: conf, }
+  end
+
+  test "sample", %{conf: conf, } do
+    {:ok, state} = Command.Sample.run(conf)
+    #{:ok, state} = Mix.Tasks.Krill.Execute.run(["sample"])
     merge_output = fn -> merge_output(state.stdout, state.stderr) end
 
     expected_out = "(line: 1) OK stdout\n(line: 3) OK stdout\n(line: 8) OK stdout\n(line: 13) OK stdout\n(line: 14) OK stdout\n(line: 15) OK stdout\n(line: 16) OK stdout\n(line: 17) OK stdout\n(line: 20) OK stdout\n"
@@ -21,13 +28,13 @@ defmodule Krill.CommandTest do
     end) == expected_err
 
     assert capture_io(fn ->
-      Command.Sample.run
-    end) == "Running #{state.command_name}\n$ #{state.command}\n\n" <> expected_out
+      Command.Sample.run(conf)
+    end) == "Running: #{state.title}\n$ #{state.command}\n\n" <> expected_out
 
     assert capture_io(:stderr, fn ->
-      Command.Sample.run
+      Command.Sample.run(conf)
     end) == expected_err <> "ERROR: #{state.command_name} - Errors have been found.\n"
-
+ 
   end
 
 end

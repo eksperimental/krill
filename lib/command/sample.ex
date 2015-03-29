@@ -2,11 +2,11 @@ defmodule Command.Sample do
   use Krill
 
   def config do
-    command_name = "Sample Command"
-    %{ 
-      name: {:global, __MODULE__},
+    command_name = "echo.sh"
+    %{
+      #command: "./test/fixtures/echo.sh",
+      title: "Sample Command",
       command_name: command_name,
-      command: "./test/fixtures/echo.sh",
       reject: [
         stdout: [
           "foobar",
@@ -17,7 +17,7 @@ defmodule Command.Sample do
           "line: 12",
         ]
       ],
-      # These messages are not needd. it is just nice to include the command name
+      # These messages are not needed. it is just nice to include the command name
       message_ok: "OK: #{command_name} - Documents have been validated.",
       message_error: "ERROR: #{command_name} - Errors have been found.",
     }

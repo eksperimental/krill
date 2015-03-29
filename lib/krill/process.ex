@@ -6,7 +6,7 @@ defmodule Krill.Process do
   @moduledoc """
   Deals with anything related to Porcelain.Process and Results
   """  
-  def run(state, _timeout \\ :infinity) do
+  def run(state, timeout \\ :infinity) do
     case state.process do
       nil ->
         #Logger.debug("PID: #{inspect self}")
@@ -16,6 +16,9 @@ defmodule Krill.Process do
         receive do
           {:ok, state} ->
             state = state
+          
+          after timeout ->
+            exit(:timeout)
         end
         state = Map.put(state, :process, process)
         {:ok, state}
