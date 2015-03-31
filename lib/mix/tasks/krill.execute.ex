@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Krill.Execute do
         Application.get_env(:krill, :config) |> Keyword.keys
 
       [":all"] ->
-        Mix.Krill.list_commands()
+        Krill.list_commands()
 
       _ ->
         Enum.map( commands, &(String.to_atom(&1)) )
@@ -19,8 +19,8 @@ defmodule Mix.Tasks.Krill.Execute do
         Mix.Task.run "app.start"
         #Logger.debug(inspect commands)
         Enum.map(commands, fn(command) ->
-          conf = Mix.Krill.merge_config(command)
-          {Task.async(conf.module, :run, [Mix.Krill.local_config(command)]), conf.timeout}
+          conf = Krill.merge_config(command)
+          {Task.async(conf.module, :run, [Krill.local_config(command)]), conf.timeout}
         end)
         |> Enum.each(fn({task, timeout}) ->
           Task.await(task, timeout)

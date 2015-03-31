@@ -8,6 +8,7 @@ defmodule Krill do
   defcallback process_std(map) :: map
   defcallback output(map) :: nil | :ok | :error
 
+
   defmacro __using__(_opts) do
     quote do
       use Application
@@ -109,6 +110,8 @@ defmodule Krill do
   end
 
   def merge_output(stdout, stderr) when is_list(stdout) and is_list(stderr) do
+    #stdout and stderr are in the format: [{line_no, line}, ...]
+
     # return the value of collection[:key]
     find = fn(collection, key) ->
       Enum.find_value(
@@ -125,9 +128,6 @@ defmodule Krill do
 
           val = find.(stderr, key) ->
             {key, :stderr, val}
-
-          true ->
-            nil
         end
       end )
   end
@@ -150,5 +150,31 @@ defmodule Krill do
   def put(state, field, fn_value) when is_function(fn_value) do
     Map.put(state, field, fn_value.(state))
   end
+  
+  @doc "Returns a list of atoms for every Command module"  
+  def list_commands(dir \\ "./lib/command") do
+    {:ok, files} = File.ls(dir)
+    Enum.map( files, &(Path.basename(&1, ".ex") |> String.to_atom) )
+  end
+
+  @doc "Returns the local config map, stored in config/config.exs"
+  def local_config,
+    do: Application.get_env(:krill, :config)
+
+  def local_config(item) when is_atom(item),
+    do: local_config()[item]
+
+  @doc "Returns the configuration for `item`, by running the new function in the given module"
+  def module_config(item) when is_atom(item) do
+    module = Module.concat([Command, String.capitalize("#{item}")])
+    apply(module, :new, [])
+  end
+
+  def module_config(items) when is_list(items),
+    do: Enum.map(items, &{&1, module_config(&1)})
+
+  @doc "Given the module `item`, it returns a merged map of the local config into the module config"
+  def merge_config(item) when is_atom(item),
+    do: Map.merge( module_config(item), local_config(item) )
 
 end
