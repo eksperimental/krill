@@ -2,10 +2,21 @@ defmodule Krill.Parser do
   import Krill.Macro
   require Logger
 
+  @typedoc "Standard line"
+  @type std_line :: {pos_integer, String.t}
+
+  @typedoc "Rules can be a string, a regular expresion or a function that returns a boolean"
+  @type rule :: String.t | Regex.t | (String.t -> as_boolean(term))
+
+  @typedoc "Can be either a string or a regular expresion"
+  @type pattern :: String.t | Regex.t
+
+
   @doc """
   Match `string` against and every rule in `rules`.
   Returns `true` if any of them matched, or `false` if none. 
   """
+  @spec match_rule?(String.t, [rule]) :: boolean
   def match_rule?(string, rules) when is_bitstring(string) and is_list(rules) do
     Enum.find_value(rules, false,
       fn(rule) -> match_rule?(string, rule)
@@ -20,11 +31,12 @@ defmodule Krill.Parser do
 
   Returns `true` or `false`.
   """
+  @spec match_rule?(String.t, rule) :: boolean
   def match_rule?(string, rule) when is_bitstring(string) do
     cond do
       is_function(rule) ->
         rule.(string)
-      
+
       empty?(string) and empty?(rule) and is_bitstring(rule) ->
         true
 
@@ -40,13 +52,15 @@ defmodule Krill.Parser do
   @doc """
   Returns the numer of lines in `string`.
   """
+  @spec count_lines(String.t) :: non_neg_integer
   def count_lines(string),
-  do: String.split(string, "\n") |> Enum.count
+    do: String.split(string, "\n") |> Enum.count
 
 
   @doc """
   Returns the number of lines in `string` for which `fun` returns a truthy value.
   """
+  @spec count_lines(String.t, (String.t -> as_boolean(term))) :: non_neg_integer
   def count_lines(string, fun) when is_function(fun) do
     String.split(string, "\n")
     |> Enum.count(string, fun)
@@ -54,8 +68,11 @@ defmodule Krill.Parser do
 
   
   @doc """
-  Returns the number of lines in `string` that match `fun` returns a truthy value.
+  Returns the number of lines in `string` that match `pattern`.
+  If `pattern` is a regular expression, `string` has to match to return true or 
+  if `pattern` is a string, `pattern` has to be a substring of `string`
   """
+  @spec count_lines(String.t, pattern) :: non_neg_integer
   def count_lines(string, pattern) do
     String.split(string, "\n") |> 
       Enum.count(string, &(&1 =~ pattern))
@@ -66,6 +83,7 @@ defmodule Krill.Parser do
   Rejects items in `collection` that are empty strings, `nil`  or
   `false`.
   """
+  @spec reject_empty([std_line]) :: [std_line]
   def reject_empty(collection) when is_list(collection) do
     Enum.reject( collection, fn
       {_line_no, line} ->
@@ -76,20 +94,28 @@ defmodule Krill.Parser do
 
   end
 
-
   @doc """
   Joins a `collection` with `joiner`, removing items that are empty
-  strings, `nil` or `false` values.
+  strings or falsey values.
 
   It keeps the last item if it's a empty string, `nil` or `false`,
   to avoid triming a trailing new lines.
+
+  Returns a string.
   """
+  @spec join(Enumerable.t, String.t) :: String.t
   def join(collection, joiner \\ "\n") do
     collection
       |> reject_empty
       |> Enum.join(joiner)
   end
 
+  @doc """
+  Splits a `string` by `delimiters`. It strips the carriage return (\n)
+  at the end of the string, if any.
+  It retuns a `list`.
+  """
+  @spec split(String.t, String.t) :: list
   def split(string, delimiter \\ "\n") do
     string
       |> String.strip(?\n)
@@ -97,10 +123,8 @@ defmodule Krill.Parser do
   end
 
 
-  ####################
-
   @doc """
-  Takes a `collection` which is a map with the format %{line_no, line} and
+  Takes a `collection` which is a map with the format {line_no, line} and
   returns a map with the same format with the lines that matched `rules`.
 
   It also takes `string`, splits it into lines, and returns only the lines that
@@ -108,7 +132,8 @@ defmodule Krill.Parser do
   
   `rules` must be a list of rules consiting of `string`s or `regex`es.
   """
-  @spec accept( nil | list | String.t, nil | list ) :: map | String.t
+  @spec accept( nil | [std_line] | String.t, nil | [rule] ) :: nil | [std_line] | String.t
+
   def accept(nil, _rules), do: nil
 
   def accept(items, nil) when is_list(items) or is_bitstring(items), do: items
@@ -129,7 +154,7 @@ defmodule Krill.Parser do
 
 
   @doc """
-  Takes a `collection` which is a map with the format %{line_no, line} and
+  Takes a `collection` which is a list with the format {line_no, line} and
   returns a map with the same format with the lines that did not match
   the `rules`.
 
@@ -138,8 +163,8 @@ defmodule Krill.Parser do
   
   `rules` must be a list of rules consiting of `string`s or `regex`es.
   """
+  @spec reject( nil | [std_line] | String.t, nil | [rule] ) :: nil | [std_line] | String.t
 
-  @spec reject( nil | list | String.t, nil | list ) :: map | String.t
   def reject(nil, _rules), do: nil
 
   def reject(items, nil) when is_list(items) or is_bitstring(items), do: items
@@ -161,14 +186,16 @@ defmodule Krill.Parser do
   @doc """
   Takes a `list` with lines, and return a list with format [{line_no, line}, ...]
   """
+  @spec numerify([String.t]) :: [std_line]
   def numerify(list) when is_list(list) do
     Enum.map_reduce(list, 1, fn(item, counter) -> { {counter, item}, counter+1} end) |> elem(0)
   end
 
   @doc """
-  Takes a `list` with lines in the format [{line_no, line}, ...], and return a list
+  Takes a `list` with lines in the format [{line_no, line}, ...], and returns a list
   containing the lines only [line_1, line_2, ...]
   """
+  @spec denumerify([std_line]) :: [String.t]
   def denumerify(list) when is_list(list)  do
     Enum.map(list, fn({_line_no, line}) -> line end)
   end

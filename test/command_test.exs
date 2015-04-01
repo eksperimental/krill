@@ -5,9 +5,8 @@ defmodule Krill.CommandTest do
   import ExUnit.CaptureIO
   alias Command.Sample
 
-  defmodule Command.Basic, do: use Krill
-  alias Command.Basic
-
+  defmodule Basic, do: use Krill
+  
   setup do
     sample = %{
       conf: local_config(:sample),

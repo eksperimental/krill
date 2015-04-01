@@ -1,14 +1,17 @@
 defmodule Krill.ExecuteTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   require Command.Sample
   require Logger
   import Krill
   import ExUnit.CaptureIO  
 
-  test "mix krill.excecute sample" do
+  setup do
     conf  = local_config(:sample)
     {:ok, state} = Command.Sample.run(conf)
+    {:ok, conf: conf, state: state, }
+  end
 
+  test "Mix.Tasks.Krill.Execute.run(:sample)", %{conf: conf} do
     assert capture_io(fn ->
       Command.Sample.run(conf)
     end) == capture_io(fn ->

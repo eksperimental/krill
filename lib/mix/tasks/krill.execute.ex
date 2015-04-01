@@ -1,8 +1,19 @@
 defmodule Mix.Tasks.Krill.Execute do
   require Logger
 
-  @doc false
-  def run(commands) do
+  @doc """
+  Executes the commands provided in list `commands`.
+
+  It list is empty, then modules in the `config/config.exs` file are loaded.
+  One or more commands If `mix krill.execute command_one command_two`.
+  If `mix krill.execute :all` is called, then `.ex` files under `lib/command/`
+  are used as commands (based on their file names).
+
+  `commands` should be a list containing only strings.
+  Returns :ok
+  """
+  @spec run([String.t]) :: :ok
+  def run(commands) when is_list(commands) do
     commands = case commands do
       [] ->
         Application.get_env(:krill, :config) |> Keyword.keys
@@ -15,7 +26,7 @@ defmodule Mix.Tasks.Krill.Execute do
     end
 
     cond do
-      is_list(commands) and length(commands) > 0 -> 
+      length(commands) > 0 -> 
         Mix.Task.run "app.start"
         #Logger.debug(inspect commands)
         Enum.map(commands, fn(command) ->
