@@ -1,3 +1,52 @@
+defmodule Command do
+  defstruct [
+    # configurable
+    title: nil,
+    module: nil,
+    command: nil,
+    command_name: nil,
+    timeout: 5000,
+    message_ok: "OK: Everything is alright.",
+    message_error: "ERROR: Errors have been found.",
+    accept: %{stdout: nil, stderr: nil},
+    reject: %{stdout: nil, stderr: nil},
+
+    # non-configurable
+    input: nil,
+    stdout: [], stdout_raw: [],
+    stderr: [], stderr_raw: [],
+    output: [],
+    process: nil,
+    result: nil,
+    status: nil, status_raw: nil,
+  ]
+  
+  @typedoc "Command struct"
+  @type t :: %Command{
+    title: nil | String.t,
+    module: nil | String.t,
+    command: nil | String.t,
+    command_name: nil | String.t,
+    timeout: non_neg_integer | :infinity,
+    message_ok: nil | String.t,
+    message_error: nil | String.t,
+    accept: %{stdout: nil | String.t, stderr: nil | String.t},
+    reject: %{stdout: nil | String.t, stderr: nil | String.t},
+
+    # non-configurable
+    input: nil | String.t,
+    stdout: [Krill.std_line],
+    stdout_raw: [Krill.std_line],
+    stderr: [Krill.std_line],
+    stderr_raw: [Krill.std_line],
+    output: list,
+    process: nil | Porcelain.Process.t,
+    result: nil | Porcelain.Result.t,
+    status: nil | non_neg_integer,
+    status_raw: nil | non_neg_integer,    
+  }
+end
+
 defmodule Krill do
   require Logger
   use Behaviour
@@ -36,55 +85,6 @@ defmodule Krill do
 
   @typedoc "Standard line with status"
   @type std_line_status :: {pos_integer, (:stdout | :stderr), String.t}
-
-  defmodule Command do
-    defstruct [
-      # configurable
-      title: nil,
-      module: nil,
-      command: nil,
-      command_name: nil,
-      timeout: 5000,
-      message_ok: "OK: Everything is alright.",
-      message_error: "ERROR: Errors have been found.",
-      accept: %{stdout: nil, stderr: nil},
-      reject: %{stdout: nil, stderr: nil},
-
-      # non-configurable
-      input: nil,
-      stdout: [], stdout_raw: [],
-      stderr: [], stderr_raw: [],
-      output: [],
-      process: nil,
-      result: nil,
-      status: nil, status_raw: nil,
-    ]
-    
-    @typedoc "Command struct"
-    @type t :: %Command{
-      title: nil | String.t,
-      module: nil | String.t,
-      command: nil | String.t,
-      command_name: nil | String.t,
-      timeout: non_neg_integer | :infinity,
-      message_ok: nil | String.t,
-      message_error: nil | String.t,
-      accept: %{stdout: nil | String.t, stderr: nil | String.t},
-      reject: %{stdout: nil | String.t, stderr: nil | String.t},
-
-      # non-configurable
-      input: nil | String.t,
-      stdout: [Krill.std_line],
-      stdout_raw: [Krill.std_line],
-      stderr: [Krill.std_line],
-      stderr_raw: [Krill.std_line],
-      output: list,
-      process: nil | Porcelain.Process.t,
-      result: nil | Porcelain.Result.t,
-      status: nil | non_neg_integer,
-      status_raw: nil | non_neg_integer,    
-    }
-  end
 
   defmacro __using__(_opts) do
     quote do
@@ -141,7 +141,7 @@ defmodule Krill do
         if empty?(state.command),
           do: exit({:shutdown, "command not provided", state})
 
-        if state.title,
+        if state.title != "",
           do: IO.puts "Running: #{state.title}"
 
         IO.puts "$ #{state.command}\n"

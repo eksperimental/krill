@@ -1,5 +1,6 @@
 %{"aleppo": {:git, "https://github.com/ChicagoBoss/aleppo.git", "381abaee108637f8df87c556d46ec7a471e8169f", [branch: "master"]},
   "dbg": {:git, "git://github.com/fishcakez/dbg.git", "5abaf737c2f4146592b33fc04ed948b4c21d84cc", []},
+  "dialyze": {:hex, :dialyze, "0.1.4"},
   "erlexec": {:git, "https://github.com/saleyn/erlexec", "1790d0729d20493b7c4e89a3f1b4e9e17d177820", []},
   "porcelain": {:git, "https://github.com/alco/porcelain", "68048a5e7239a4874be4a3f0d34839d5d93071e8", []},
   "quaff": {:git, "git://github.com/qhool/quaff.git", "b8b6b3d7830659713d7e7ca8a2788880498a3211", []},

@@ -39,6 +39,7 @@ defmodule Krill.Mixfile do
       {:porcelain, git: "https://github.com/alco/porcelain"},
       {:dbg, github: "fishcakez/dbg"},
       {:quaff, github: "qhool/quaff"},
+      {:dialyze, "~> 0.1.4"},
     ]
   end
 end

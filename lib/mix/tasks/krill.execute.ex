@@ -1,11 +1,38 @@
 defmodule Mix.Tasks.Krill.Execute do
   require Logger
+  use Mix.Task
+
+  @shortdoc "Executes commands"
+
+  @moduledoc """
+  Executes the commands provided in list `commands`.
+
+  Usage: `mix krill.execute commands`
+
+  ## Examples
+  `mix krill.exectue`
+  
+  If no commands are provided, then modules in the `config/config.exs` file are loaded.
+
+  `mix krill.exectue sample`
+  `mix krill.exectue sample htmlproof`
+  
+  One or more commands If `mix krill.execute command_one command_two`.
+  
+  `mix krill.exectue :all`
+  
+  If `mix krill.execute :all` is called, then `.ex` files under `lib/command/`
+  are used as commands (based on their file names).
+
+  """
+
 
   @doc """
   Executes the commands provided in list `commands`.
 
-  It list is empty, then modules in the `config/config.exs` file are loaded.
+  If list is empty, then modules in the `config/config.exs` file are loaded.
   One or more commands If `mix krill.execute command_one command_two`.
+  
   If `mix krill.execute :all` is called, then `.ex` files under `lib/command/`
   are used as commands (based on their file names).
 
@@ -43,5 +70,5 @@ defmodule Mix.Tasks.Krill.Execute do
 
     :ok
   end
-  
+
 end

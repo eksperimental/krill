@@ -1,5 +1,5 @@
 defmodule Krill.CommandTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   require Logger
   import Krill
   import ExUnit.CaptureIO
