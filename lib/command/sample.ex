@@ -1,4 +1,9 @@
 defmodule Command.Sample do
+  @moduledoc """
+  `Command.Sample` is very basic `Krill` module that only applies creates
+  a comand, with some reject rules and customized success and error messages.
+  """
+
   use Krill
 
   def config do

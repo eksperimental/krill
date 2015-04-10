@@ -1,11 +1,14 @@
 defmodule Krill.Process do
-  alias Porcelain.Result
-  require Logger
-  import Krill.Macro
-
   @moduledoc """
   Deals with anything related to Porcelain.Process and Results
   """
+
+  alias Porcelain.Result
+  require Logger
+  import Krill, only: [empty?: 1]
+
+  @status_ok 0
+  @status_error_generic 1
 
   @doc """
   Runs the comand stored in `state`, and returns the new state containing
@@ -13,7 +16,7 @@ defmodule Krill.Process do
 
   Returns `{:ok, state}`
   """
-  @spec run(Krill.t, non_neg_integer | :infinity) :: {:ok, Krill.t}
+  @spec run(Command.t, non_neg_integer | :infinity) :: {:ok, Command.t}
   def run(state, timeout \\ :infinity) do
     case state.process do
       nil ->
@@ -42,7 +45,7 @@ defmodule Krill.Process do
 
   Returns `{:ok, state}`
   """
-  @spec handle_output(pid, pid, Krill.t, pos_integer) :: {:ok, Krill.t}
+  @spec handle_output(pid, pid, Command.t, pos_integer) :: {:ok, Command.t}
   def handle_output(sender, pid, state, counter \\ 1) do
     receive do
       { ^pid, :data, :out, data } ->
@@ -63,27 +66,27 @@ defmodule Krill.Process do
     end
   end
 
-  # Reads multiline `data` and returns a tuple list of individual lines,
-  # in the format of [{line_no, line}, ...]
-  @spec get_multiline_data(String.t, pos_integer) :: [Krill.std_line]
+  # Reads multiline `data` and returns a tuple, containing ,
+  # in the format of {[{line_no, line}, ...], counter}
+  @spec get_multiline_data(String.t, pos_integer) :: {[Krill.std_line], pos_integer}
   defp get_multiline_data(data, counter) do
-    Enum.map_reduce( String.split( String.rstrip(data, ?\n), "\n"), counter,
-      &{{&2, &1}, &2+1}
-    )
+    String.rstrip(data, ?\n)
+      |> String.split("\n")
+      |> Enum.map_reduce( counter, fn(line, line_no) -> {{line_no, line}, line_no+1} end )
   end
 
   @doc """
-  Determines the output `status` to tbe set, based on the state information.
+  Determines the output `status` to be set, based on the state information.
   """
-  @spec determine_status(Krill.t) :: non_neg_integer
+  @spec determine_status(Command.t) :: non_neg_integer
   def determine_status(state) do
     cond do
       empty?(state.stderr) ->
-        0
+        @status_ok
 
-      # status_raw is 0, but stderr neither empty, nor falsey
-      state.status_raw == 0 ->
-        1
+      # status_raw is @status_ok, but stderr neither empty, nor falsey
+      state.status_raw == @status_ok ->
+        @status_error_generic
       
       # set same as status_raw
       true ->

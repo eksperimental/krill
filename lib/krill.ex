@@ -1,84 +1,66 @@
 defmodule Command do
   defstruct [
     # configurable
-    title: nil,
-    module: nil,
-    command: nil,
-    command_name: nil,
-    timeout: 5000,
-    message_ok: "OK: Everything is alright.",
+    title:         nil,
+    module:        nil,
+    command:       nil,
+    command_name:  nil,
+    timeout:       5000,
+    message_ok:    "OK: Everything is alright.",
     message_error: "ERROR: Errors have been found.",
-    accept: %{stdout: nil, stderr: nil},
-    reject: %{stdout: nil, stderr: nil},
+    accept:        %{stdout: nil, stderr: nil},
+    reject:        %{stdout: nil, stderr: nil},
 
     # non-configurable
-    input: nil,
-    stdout: [], stdout_raw: [],
-    stderr: [], stderr_raw: [],
-    output: [],
-    process: nil,
-    result: nil,
-    status: nil, status_raw: nil,
+    input:      nil,
+    stdout:     [],
+    stdout_raw: [],
+    stderr:     [],
+    stderr_raw: [],
+    output:     [],
+    process:    nil,
+    result:     nil,
+    status:     nil,
+    status_raw: nil,
   ]
   
   @typedoc "Command struct"
   @type t :: %Command{
-    title: nil | String.t,
-    module: nil | String.t,
-    command: nil | String.t,
-    command_name: nil | String.t,
-    timeout: non_neg_integer | :infinity,
-    message_ok: nil | String.t,
+    title:         nil | String.t,
+    module:        nil | String.t,
+    command:       nil | String.t,
+    command_name:  nil | String.t,
+    timeout:       non_neg_integer | :infinity,
+    message_ok:    nil | String.t,
     message_error: nil | String.t,
-    accept: %{stdout: nil | String.t, stderr: nil | String.t},
-    reject: %{stdout: nil | String.t, stderr: nil | String.t},
+    accept:        %{stdout: nil | String.t, stderr: nil | String.t},
+    reject:        %{stdout: nil | String.t, stderr: nil | String.t},
 
     # non-configurable
-    input: nil | String.t,
-    stdout: [Krill.std_line],
+    input:      nil | String.t,
+    stdout:     [Krill.std_line],
     stdout_raw: [Krill.std_line],
-    stderr: [Krill.std_line],
+    stderr:     [Krill.std_line],
     stderr_raw: [Krill.std_line],
-    output: list,
-    process: nil | Porcelain.Process.t,
-    result: nil | Porcelain.Result.t,
-    status: nil | non_neg_integer,
-    status_raw: nil | non_neg_integer,    
+    output:     list,
+    process:    nil | Porcelain.Process.t,
+    result:     nil | Porcelain.Result.t,
+    status:     nil | non_neg_integer,
+    status_raw: nil | non_neg_integer,
   }
 end
 
 defmodule Krill do
-  require Logger
-  use Behaviour
-
-  @callback new() :: t
-  defcallback new()
-
-  @callback config() :: map
-  defcallback config()
-  
-  @callback run() :: {atom, t}
-  defcallback run()
-  
-  @callback capture(t) :: t
-  defcallback capture(map)
-  
-  @callback process_std(t) :: t
-  defcallback process_std(map)
-  
-  @callback output(t) :: nil | :ok | :error
-  defcallback output(map)
-
   @moduledoc """
-  Krill is a filter feeder that executes a shell command, and filters stdout and
+  `Krill` is a filter feeder that executes a shell command, and filters stdout and
   stderr, according to rules set in the child module. Letting us get rid of
   commands that will output exit with an error message and error status, and
   being able to use this in Continuous Integration or other projects where
   need our commands to return 0.
   """
 
-  @typedoc "Standard line"
-  @type t :: Command.t
+  require Logger
+  use Behaviour
 
   @typedoc "Standard line"
   @type std_line :: {pos_integer, String.t}
@@ -86,26 +68,33 @@ defmodule Krill do
   @typedoc "Standard line with status"
   @type std_line_status :: {pos_integer, (:stdout | :stderr), String.t}
 
+  defcallback new() :: Command.t
+  defcallback config() :: map
+  defcallback run() :: {atom, Command.t}
+  defcallback capture(Command.t) :: Command.t
+  defcallback process_std(Command.t) :: Command.t
+  defcallback output(Command.t) :: nil | :ok | :error
+
+  @status_ok 0
+  #@status_error_generic 1
+  
   defmacro __using__(_opts) do
     quote do
-      use Application
       require Logger
+      use Application
       import Krill
-      import Krill.Macro
       require Krill.Process
       alias Krill.Parser
 
       @behaviour Krill
 
-      def get_module do
-        #quote do: __MODULE__
-        __MODULE__
-      end
-
-
+      def get_module, do: __MODULE__
       def config(), do: %{}
       def capture(state), do: state
       def process_std(state), do: state
+
+      @doc false
+      def start(_type, _args), do: {:ok, self()}
 
       @doc """
       Create a new command merging the values of `conf` into the default
@@ -113,7 +102,7 @@ defmodule Krill do
 
       Returns a map with the state
       """
-      @spec new(nil | map | Krill.t) :: Krill.t
+      @spec new(nil | map | Command.t) :: Command.t
       def new(conf \\ nil) when is_nil(conf) when is_map(conf) do
         result = Map.merge(%Command{}, config())
         if conf,
@@ -123,15 +112,12 @@ defmodule Krill do
         |> Map.put(:name, {:global, __MODULE__})
       end
 
-      @doc false
-      def start(_type, _args), do: nil
-
       @doc """
       Runs the command.
 
       Returns a tuple with {:ok, state}
       """
-      @spec run(nil | map | Krill.t) :: {:ok, Krill.t}
+      @spec run(nil | map | Command.t) :: {:ok, Command.t}
       def run(conf \\ nil) do
         #IO.inspect(conf)
         state = new(conf)
@@ -164,12 +150,12 @@ defmodule Krill do
 
       Returns `:ok`  
       """
-      @spec output(Krill.t) :: :ok
+      @spec output(Command.t) :: :ok
       def output(state) when is_map(state) do
         print_output( merge_output(state.stdout, state.stderr) )
 
         case state.status do
-          0 ->
+          @status_ok ->
             IO.puts( state.message_ok )
           _ ->
             IO.puts( :stderr, state.message_error )
@@ -178,9 +164,22 @@ defmodule Krill do
         :ok
       end
 
-      defoverridable [config: 0, start: 2, new: 0, process_std: 1, capture: 1, run: 0, ]
+      defoverridable [config: 0, new: 0, process_std: 1, capture: 1, run: 0, ]
     end
   end
+
+  @doc """
+  Checks if `value` is a falsey value, an empty string or an empty list.  
+  """
+  @spec empty?(term) :: boolean
+  def empty?(value)
+    when value == ""
+    when value == []
+    when value == false
+    when is_nil(value),
+    do: true
+
+  def empty?(_value), do: false
 
   @doc """
   Merge tuple lists `stdout` and `stderr` with format {line_no, msg}, into a new tuple
@@ -249,8 +248,8 @@ defmodule Krill do
     do: local_config()[item]
 
   @doc "Returns the configuration for `item`, by running the new function in the given module"
-  @spec module_config(atom) :: t
-  @spec module_config([atom]) :: [{atom, t}]
+  @spec module_config(atom) :: Command.t
+  @spec module_config([atom]) :: [{atom, Command.t}]
 
   def module_config(item) when is_atom(item) do
     module = Module.concat([Command, String.capitalize("#{item}")])
@@ -261,7 +260,7 @@ defmodule Krill do
     do: Enum.map(items, &{&1, module_config(&1)})
 
   @doc "Given the module `item`, it returns a merged map of the local config into the module config"
-  @spec merge_config(atom) :: t 
+  @spec merge_config(atom) :: Command.t 
   def merge_config(item) when is_atom(item),
     do: Map.merge( module_config(item), local_config(item) )
 

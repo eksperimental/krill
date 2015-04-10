@@ -8,7 +8,8 @@ defmodule KrillTest do
   defmodule Command.Basic, do: use Krill
   alias Command.Basic
 
-
+  @status_ok    0
+  @status_error_generic 1
 
   setup do
     sample = %{
@@ -18,14 +19,14 @@ defmodule KrillTest do
     {:ok, state: Basic.new(), sample: sample, }
   end
 
-  test "put with function", %{state: state, } do
+  test "put with function & Krill.Process.determine_status", %{state: state, } do
     # stderr: nil
     state = Map.merge(state, %{
       status_raw: 25,
       stderr: nil,
     })
     state = put(state, :status, &Krill.Process.determine_status/1)
-    assert state.status == 0
+    assert state.status == @status_ok 
 
     # stderr: false
     state = Map.merge(state, %{
@@ -33,7 +34,7 @@ defmodule KrillTest do
       stderr: false,
     })
     state = put(state, :status, &Krill.Process.determine_status/1)
-    assert state.status == 0
+    assert state.status == @status_ok 
 
     # stderr: ""
     state = Map.merge(state, %{
@@ -41,15 +42,15 @@ defmodule KrillTest do
       stderr: "",
     })
     state = put(state, :status, &Krill.Process.determine_status/1)
-    assert state.status == 0
+    assert state.status == @status_ok 
 
-    # status_raw: 0, but stderr is truthy
+    # status_raw: @status_ok, but stderr is truthy
     state = Map.merge(state, %{
-      status_raw: 0,
+      status_raw: @status_ok,
       stderr: "foo",
     })
     state = put(state, :status, &Krill.Process.determine_status/1)
-    assert state.status == 1
+    assert state.status == @status_error_generic
 
     # status_raw: not 0, and stderr not empty neither falsey
     state = Map.merge(state, %{
@@ -60,10 +61,10 @@ defmodule KrillTest do
     assert state.status == 25
 
     # Other scenarios
-    # stderr: 0
+    # stderr: @status_ok 
     state = Map.merge(state, %{
       status_raw: 25,
-      stderr: 0,
+      stderr: @status_ok,
     })
     state = put(state, :status, &Krill.Process.determine_status/1)
     assert state.status == 25

@@ -1,4 +1,9 @@
 defmodule Krill.Debug do
+  @moduledoc """
+  Debugs the `Krill` application.
+  """
+
+  require Quaff.Debug
   require Logger
 
   @doc "Runs the debugger into the `module`"

@@ -2,6 +2,7 @@ defmodule Krill.ProcessTest do
   use ExUnit.Case, async: true
   doctest Krill.Process
   alias Porcelain.Result
+  alias Krill.Parser
   use Krill
 
   setup do
@@ -30,38 +31,39 @@ defmodule Krill.ProcessTest do
     end
   end
 
-  def handle_output(sender, pid, state) do
-    receive do
-      { ^pid, :data, :out, data } ->
-        #Logger.debug "OUT: #{inspect(data)}"
-        handle_output( sender, pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}#{data}") )
-
-      { ^pid, :data, :err, data } ->
-        #Logger.debug "ERR: #{inspect(data)}"
-        handle_output( sender, pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}#{data}") )
-
-      { ^pid, :result, result=%Result{status: status} } ->
-        state = Map.merge(state, %{status_raw: status, result: result})
-        #IO.puts "State (handle_output): #{inspect(state)}"
-        send sender, { :ok, state }
-    #after
-    #  :infinity -> IO.puts "timeout"
-    end
-  end
+  # def handle_output(sender, pid, state) do
+  #   receive do
+  #     { ^pid, :data, :out, data } ->
+  #       #Logger.debug "OUT: #{inspect(data)}"
+  #       handle_output( sender, pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}#{data}") )
+  #
+  #     { ^pid, :data, :err, data } ->
+  #       #Logger.debug "ERR: #{inspect(data)}"
+  #       handle_output( sender, pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}#{data}") )
+  #
+  #     { ^pid, :result, result=%Result{status: status} } ->
+  #       state = Map.merge(state, %{status_raw: status, result: result})
+  #       #IO.puts "State (handle_output): #{inspect(state)}"
+  #       send sender, { :ok, state }
+  #   #after
+  #   #  :infinity -> IO.puts "timeout"
+  #   end
+  # end
 
   test "spawn_shell", %{state: state, expected_out: expected_out, expected_err: expected_err, } do
     {:ok, process} = exec(self, state.command, :spawn_shell)
     %Porcelain.Process{pid: pid} = process
-    _state_handled = handle_output(self, pid, state)
+    _state_handled = Krill.Process.handle_output(self, pid, state)
 
     receive do
       {:ok, state} ->
         state = state
     end
+    IO.inspect(state)
 
     state = Map.put(state, :process, process)
-    assert state.stdout_raw == expected_out
-    assert state.stderr_raw == expected_err
+    assert (Parser.denumerify(state.stdout_raw) |> Parser.join) <> "\n" == expected_out
+    assert (Parser.denumerify(state.stderr_raw) |> Parser.join) <> "\n" == expected_err
   end
 
   test "shell", %{state: state,  expected_out: expected_out, expected_err: expected_err, } do
@@ -76,4 +78,5 @@ defmodule Krill.ProcessTest do
     assert state.stderr_raw == expected_err
   end
 
+  # test "determine_status" is done in `krill_test.exs`
 end

@@ -63,6 +63,17 @@ defmodule Krill.ParserTest do
     assert Parser.count_lines(text) == 4
   end
 
+  test "count lines with function" do
+    text = "1\n2\n3\n4\n5"
+    assert Parser.count_lines(text, &( rem(String.to_integer(&1), 2) == 0) ) == 2
+  end
+
+  test "count lines with pattern" do
+    text = "1a\n2b\n3a\n4b\n5a"
+    assert Parser.count_lines(text, "a") == 3
+    assert Parser.count_lines(text, ~r/^\db$/) == 2
+  end
+
   test "count lines trailing new line" do
     text = "1\n2\n3\n4\n"
     assert Parser.count_lines(text) == 5

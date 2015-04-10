@@ -1,6 +1,10 @@
 defmodule Krill.Parser do
-  import Krill.Macro
+  @moduledoc """
+  Deals with anything related to Porcelain.Process and Results
+  """
+  
   require Logger
+  import Krill, only: [empty?: 1]
 
   @typedoc "Standard line"
   @type std_line :: {pos_integer, String.t}
@@ -63,7 +67,7 @@ defmodule Krill.Parser do
   @spec count_lines(String.t, (String.t -> as_boolean(term))) :: non_neg_integer
   def count_lines(string, fun) when is_function(fun) do
     String.split(string, "\n")
-    |> Enum.count(string, fun)
+    |> Enum.count(fun)
   end
 
   
@@ -75,7 +79,7 @@ defmodule Krill.Parser do
   @spec count_lines(String.t, pattern) :: non_neg_integer
   def count_lines(string, pattern) do
     String.split(string, "\n") |> 
-      Enum.count(string, &(&1 =~ pattern))
+      Enum.count(&(&1 =~ pattern))
   end
 
 
