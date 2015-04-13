@@ -28,7 +28,7 @@ defmodule Command.Sample do
     }
   end
 
-  def process_std(state) do
+  def process(state) do
     stdout = Parser.reject(state.stdout_raw, state.reject[:stdout])
     stderr = Parser.reject(state.stderr_raw, state.reject[:stderr])
     Map.merge(state, %{stdout: stdout, stderr: stderr})

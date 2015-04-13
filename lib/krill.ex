@@ -17,7 +17,6 @@ defmodule Command do
     stdout_raw: [],
     stderr:     [],
     stderr_raw: [],
-    output:     [],
     process:    nil,
     result:     nil,
     status:     nil,
@@ -33,8 +32,8 @@ defmodule Command do
     timeout:       non_neg_integer | :infinity,
     message_ok:    nil | String.t,
     message_error: nil | String.t,
-    accept:        %{stdout: nil | String.t, stderr: nil | String.t},
-    reject:        %{stdout: nil | String.t, stderr: nil | String.t},
+    accept:        %{stdout: (nil | String.t), stderr: (nil | String.t)},
+    reject:        %{stdout: (nil | String.t), stderr: (nil | String.t)},
 
     # non-configurable
     input:      nil | String.t,
@@ -42,7 +41,6 @@ defmodule Command do
     stdout_raw: [Krill.std_line],
     stderr:     [Krill.std_line],
     stderr_raw: [Krill.std_line],
-    output:     list,
     process:    nil | Porcelain.Process.t,
     result:     nil | Porcelain.Result.t,
     status:     nil | non_neg_integer,
@@ -68,12 +66,13 @@ defmodule Krill do
   @typedoc "Standard line with status"
   @type std_line_status :: {pos_integer, (:stdout | :stderr), String.t}
 
-  defcallback new() :: Command.t
+  defcallback new(nil | map | Command.t) :: Command.t
   defcallback config() :: map
-  defcallback run() :: {atom, Command.t}
-  defcallback capture(Command.t) :: Command.t
-  defcallback process_std(Command.t) :: Command.t
-  defcallback output(Command.t) :: nil | :ok | :error
+  defcallback run(nil | map | Command.t) :: {atom, Command.t}
+  defcallback postprocess(Command.t) :: Command.t
+  defcallback process(Command.t) :: Command.t
+  defcallback postprocess(Command.t) :: Command.t
+  defcallback output(Command.t) :: :ok | :error
 
   @status_ok 0
   #@status_error_generic 1
@@ -88,14 +87,20 @@ defmodule Krill do
 
       @behaviour Krill
 
-      def get_module, do: __MODULE__
-      def config(), do: %{}
-      def capture(state), do: state
-      def process_std(state), do: state
+      @status_ok unquote(@status_ok)
 
       @doc false
       def start(_type, _args), do: {:ok, self()}
 
+      @doc "Gets the module name of the module invoking the `use` macro."
+      def get_module, do: __MODULE__
+
+      @doc """
+      Creates a basic configuration for the command. Such as setting `command`, 
+      `accept` and `reject` rules, and success or error messages.
+      """
+      def config(), do: %{}
+      
       @doc """
       Create a new command merging the values of `conf` into the default
       configs and the ones set int `config/config.exs`
@@ -117,7 +122,7 @@ defmodule Krill do
 
       Returns a tuple with {:ok, state}
       """
-      @spec run(nil | map | Command.t) :: {:ok, Command.t}
+      @spec run(nil | map | Command.t) :: {(:ok | :error), Command.t}
       def run(conf \\ nil) do
         #IO.inspect(conf)
         state = new(conf)
@@ -134,11 +139,12 @@ defmodule Krill do
         {:ok, state} = Krill.Process.run(state)
         
         state = state
-          |> capture()
-          |> process_std
+          |> preprocess
+          |> process
           |> put(:status, &Krill.Process.determine_status/1)
+          |> postprocess
 
-        output(state)
+        :ok = output(state)
 
         #Logger.debug "FINAL STATE [run]: #{inspect(state)}"
         #IO.inspect(state)
@@ -146,13 +152,36 @@ defmodule Krill do
       end
 
       @doc """
+      Preprocess `state`, right before it is sent to `process`.
+      """
+      @spec preprocess(Command.t) :: Command.t
+      def preprocess(state), do: state
+
+      @doc """
+      The main function of this callback is to add the :stdout and :stderr to
+      the %Command{} struct given.
+      """      
+      @spec process(Command.t) :: Command.t
+      def process(state), do: state
+
+      @doc """
+      This is a post processing operation, the last one before messages are going to
+      be printed.
+
+      Here's where you will usually write your `message_ok` and `message_error` based on
+      the results produced by `process`.
+      """
+      @spec postprocess(Command.t) :: Command.t
+      def postprocess(state), do: state
+
+      @doc """
       Outputs `state` on screen, sending message to `stdout` and `stderr`.
 
       Returns `:ok`  
       """
-      @spec output(Command.t) :: :ok
+      @spec output(Command.t) :: :ok | :error
       def output(state) when is_map(state) do
-        print_output( merge_output(state.stdout, state.stderr) )
+        merge_output(state.stdout, state.stderr) |> print_output
 
         case state.status do
           @status_ok ->
@@ -164,7 +193,7 @@ defmodule Krill do
         :ok
       end
 
-      defoverridable [config: 0, new: 0, process_std: 1, capture: 1, run: 0, ]
+      defoverridable [config: 0, new: 0, preprocess: 1, process: 1, postprocess: 1, run: 1, ]
     end
   end
 

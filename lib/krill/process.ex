@@ -51,14 +51,14 @@ defmodule Krill.Process do
       { ^pid, :data, :out, data } ->
         #Logger.debug(data)
         {data_lines, counter_updated} = get_multiline_data(data, counter)
-        {_, state_updated} = get_and_update_in( state.stdout_raw, &({&1, &1 ++ data_lines }) )
+        state_updated = update_in( state.stdout_raw, &(&1 ++ data_lines) )
         handle_output(sender, pid, state_updated, counter_updated)
 
       { ^pid, :data, :err, data } ->
         #Logger.debug(data)
         {data_lines, counter_updated} = get_multiline_data(data, counter)
-        {_, state_updated} = get_and_update_in( state.stderr_raw, &({&1, &1 ++ data_lines }) )
-        handle_output( sender, pid, state_updated, counter_updated)
+        state_updated = update_in( state.stderr_raw, &(&1 ++ data_lines) )
+        handle_output(sender, pid, state_updated, counter_updated)
 
       { ^pid, :result, result=%Result{status: status} } ->
         state = Map.merge(state, %{status_raw: status, result: result})

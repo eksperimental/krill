@@ -136,14 +136,14 @@ defmodule Krill.Parser do
   
   `rules` must be a list of rules consiting of `string`s or `regex`es.
   """
-  @spec accept( nil | [std_line] | String.t, nil | [rule] ) :: nil | [std_line] | String.t
+  @spec accept( (nil | [std_line] | String.t), (nil | [rule]) ) :: nil | [std_line] | String.t
 
   def accept(nil, _rules), do: nil
 
   def accept(items, nil) when is_list(items) or is_bitstring(items), do: items
 
   def accept(collection, rules) when is_list(collection) and is_list(rules) do
-    Enum.filter( collection, fn({_line_no, line}) ->
+    Enum.filter(collection, fn({_line_no, line}) ->
       match_rule?(line, rules)
     end)
   end

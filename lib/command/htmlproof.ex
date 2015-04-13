@@ -34,12 +34,11 @@ defmodule Command.Htmlproof do
     }
   end
 
-  def process_std(state) do
+  def process(state) do
     #stdout
     stdout = state.stdout_raw
       |> Parser.accept(state.accept[:stdout])
       |> Parser.reject(state.reject[:stdout])
-      #|> discard_files_no_errors
       |> Parser.reject_empty
 
     #stderr
@@ -53,6 +52,9 @@ defmodule Command.Htmlproof do
     Map.merge(state, %{stdout: stdout, stderr: stderr})
   end
 
+  @doc """
+  Discards errors related to missing favicons on redirect pages.
+  """
   def discard_favicons_on_redirects(collection) do
     {result, _} = Enum.map_reduce(collection, "", fn({line_no, line}, current_file)->
       cond do
@@ -72,8 +74,10 @@ defmodule Command.Htmlproof do
     result
   end
 
-  # delete every file that has no errors
-  # (ie, any file that is not followed by a line starting with "  *  ")
+  @doc """
+  Discards every file that has no errors (ie, any file that is not followed by
+  a line starting with "  *  ")
+  """
   def discard_files_no_errors(collection) do
     #Logger.debug "COLLECTION:"; IO.inspect collection
 
@@ -112,8 +116,7 @@ defmodule Command.Htmlproof do
     result
   end
 
-  # Improve OK/ERRROR messages  
-  def capture(state) do
+  def postprocess(state) do
     stdout = Keyword.values(state.stdout_raw) |> Parser.join
     stderr = Keyword.values(state.stderr_raw) |> Parser.join
 

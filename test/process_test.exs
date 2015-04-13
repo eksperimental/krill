@@ -1,7 +1,6 @@
 defmodule Krill.ProcessTest do
   use ExUnit.Case, async: true
   doctest Krill.Process
-  alias Porcelain.Result
   alias Krill.Parser
   use Krill
 
@@ -30,25 +29,6 @@ defmodule Krill.ProcessTest do
         {:ok, process}
     end
   end
-
-  # def handle_output(sender, pid, state) do
-  #   receive do
-  #     { ^pid, :data, :out, data } ->
-  #       #Logger.debug "OUT: #{inspect(data)}"
-  #       handle_output( sender, pid, Map.put(state, :stdout_raw, "#{state.stdout_raw}#{data}") )
-  #
-  #     { ^pid, :data, :err, data } ->
-  #       #Logger.debug "ERR: #{inspect(data)}"
-  #       handle_output( sender, pid, Map.put(state, :stderr_raw, "#{state.stderr_raw}#{data}") )
-  #
-  #     { ^pid, :result, result=%Result{status: status} } ->
-  #       state = Map.merge(state, %{status_raw: status, result: result})
-  #       #IO.puts "State (handle_output): #{inspect(state)}"
-  #       send sender, { :ok, state }
-  #   #after
-  #   #  :infinity -> IO.puts "timeout"
-  #   end
-  # end
 
   test "spawn_shell", %{state: state, expected_out: expected_out, expected_err: expected_err, } do
     {:ok, process} = exec(self, state.command, :spawn_shell)
