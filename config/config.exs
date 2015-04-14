@@ -15,7 +15,7 @@ config :krill, config: [
     title: "Validate site with Htmlproof",
     command_name: "htmlproof",
     command: "htmlproof ./test/fixtures/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --disable-external",
-    #command: "htmlproof ~/git/eksperimental/elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
+    #command: "htmlproof ../elixir-lang.github.com/_site --file-ignore /docs/ --only-4xx --check-favicon --check-html --check-external-hash",
     timeout: 1000 * 60 * 15, # 15mins
     },
 ]

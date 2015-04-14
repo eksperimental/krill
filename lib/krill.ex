@@ -254,11 +254,13 @@ defmodule Krill do
     :ok
   end
 
+
   @doc "Put field, value pair into state"
   @spec put(map, term, term) :: map
   def put(state, field, fn_value) when is_function(fn_value) do
     Map.put(state, field, fn_value.(state))
   end
+
   
   @doc "Returns a list of atoms for every Command module"  
   @spec list_commands(String.t) :: [atom]
@@ -266,6 +268,7 @@ defmodule Krill do
     {:ok, files} = File.ls(dir)
     Enum.map( files, &(Path.basename(&1, ".ex") |> String.to_atom) )
   end
+
 
   @doc "Returns the local config map, stored in config/config.exs"
   @spec local_config() :: term
@@ -275,6 +278,7 @@ defmodule Krill do
 
   def local_config(item) when is_atom(item),
     do: local_config()[item]
+
 
   @doc "Returns the configuration for `item`, by running the new function in the given module"
   @spec module_config(atom) :: Command.t
@@ -287,6 +291,7 @@ defmodule Krill do
 
   def module_config(items) when is_list(items),
     do: Enum.map(items, &{&1, module_config(&1)})
+
 
   @doc "Given the module `item`, it returns a merged map of the local config into the module config"
   @spec merge_config(atom) :: Command.t 
