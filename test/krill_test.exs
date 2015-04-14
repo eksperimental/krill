@@ -2,6 +2,7 @@ defmodule KrillTest do
   use ExUnit.Case, async: true
   require Logger
   import Krill
+  require Version
 
   doctest Krill
 
@@ -103,5 +104,17 @@ defmodule KrillTest do
   test "merge_config" do
     assert is_map( merge_config(:sample) ) == true
     assert merge_config(:sample).title != ""
- end
+  end
+
+  test "version" do
+    assert is_bitstring(version()) != version()
+
+    {:ok, v} = Version.parse(version())
+    assert v != ""
+  end
+
+  test "app name" do
+    assert "krill" == app
+  end
+
 end

@@ -197,6 +197,14 @@ defmodule Krill do
     end
   end
 
+  @doc "Returns app name"
+  @spec app() :: String.t
+  def app, do: Atom.to_string(unquote(Mix.Project.config[:app]))
+
+  @doc "Returns app version number"
+  @spec version() :: String.t
+  def version, do: unquote(Mix.Project.config[:version])
+
   @doc """
   Checks if `value` is a falsey value, an empty string or an empty list.  
   """
@@ -297,5 +305,72 @@ defmodule Krill do
   @spec merge_config(atom) :: Command.t 
   def merge_config(item) when is_atom(item),
     do: Map.merge( module_config(item), local_config(item) )
+
+
+  @doc """
+  Executes the commands provided in list `commands`.
+
+  If list is empty, then modules in the `config/config.exs` file are loaded.
+  One or more commands If `krill command_one command_two`.
+  
+  If `krill :all` is called, then `.ex` files under `lib/command/`
+  are used as commands (based on their file names).
+
+  `command_names` should be a list containing strings, or a tuple containing
+  {"command_name", "command_line"}
+  
+  Returns :ok
+  """
+  @spec execute([String.t | {String.t | String.t}]) :: :ok | :error
+
+  def execute(command_names) when command_names == [] when command_names == [":config"] do
+    Application.get_env(:krill, :config)
+    |> Keyword.keys
+    |> do_execute
+  end
+
+  def execute([":all"]) do
+    Krill.list_commands()
+    |> do_execute
+  end
+  
+  def execute(command_names) when is_list(command_names) do
+    Enum.map( command_names, fn
+      {command_name, command_line} ->
+        {String.to_atom(command_name), command_line}
+
+      command ->
+        String.to_atom(command)
+    end)
+    |> do_execute
+  end
+
+  @spec do_execute([atom | {atom | String.t}]) :: :ok | :error
+  defp do_execute(commands) do
+    cond do
+      length(commands) > 0 -> 
+        Enum.map(commands, fn(command) ->
+          case command do
+            {command_name, command_line} ->
+              conf = Krill.local_config(command_name) |> Map.merge(%{command: command_line})
+              command_name = command_name
+
+            _ ->
+              command_name = command
+              conf = Krill.local_config(command_name)
+          end
+          conf_merged = Krill.merge_config(command_name)
+          {Task.async(conf_merged.module, :run, [conf]), conf_merged.timeout}
+        end)
+        |> Enum.each(fn({task, timeout}) ->
+          Task.await(task, timeout)
+        end)
+
+      true ->
+        exit({:shutdown, "No module_names provided"})
+    end
+
+    :ok
+  end
 
 end

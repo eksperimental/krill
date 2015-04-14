@@ -19,7 +19,7 @@ defmodule Command.HtmlproofTest do
 - something else
 """
 
-    result = """
+    expected = """
 - ./_site/getting_started/mix-otp/task-and-gen-tcp.html
   *  linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist (line 227)
 - ./_site/getting_started/1.html
@@ -31,7 +31,7 @@ defmodule Command.HtmlproofTest do
 """
 
     #Logger.debug inspect(text)
-    #Logger.debug inspect(result)
+    #Logger.debug inspect(expected)
 
     lhs = text
       |> Parser.split
@@ -40,7 +40,7 @@ defmodule Command.HtmlproofTest do
       |> Parser.denumerify
       |> Parser.join
 
-    assert lhs == String.strip(result)
+    assert lhs == String.strip(expected)
   end
 
 
@@ -62,7 +62,7 @@ defmodule Command.HtmlproofTest do
 - something else2
 """
 
-    result = """
+    expected = """
 - ./_site/getting_started/mix-otp/task-and-gen-tcp.html
   *  linking to /docs/stable/elixir/Kernel.html#%7C%3E/2, but %7C%3E/2 does not exist (line 227)
   *  no favicon specified
@@ -79,6 +79,6 @@ defmodule Command.HtmlproofTest do
       |> Parser.denumerify
       |> Parser.join
       
-   assert lhs == String.strip(result)
+   assert lhs == String.strip(expected)
  end
 end
