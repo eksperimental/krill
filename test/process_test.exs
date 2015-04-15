@@ -39,7 +39,7 @@ defmodule Krill.ProcessTest do
       {:ok, state} ->
         state = state
     end
-    IO.inspect(state)
+    #IO.inspect(state)
 
     state = Map.put(state, :process, process)
     assert (Parser.denumerify(state.stdout_raw) |> Parser.join) <> "\n" == expected_out

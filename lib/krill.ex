@@ -66,6 +66,8 @@ defmodule Krill do
   @typedoc "Standard line with status"
   @type std_line_status :: {pos_integer, (:stdout | :stderr), String.t}
 
+  @type execute_result :: {(:ok | :error), {atom, map}}
+
   defcallback new(nil | map | Command.t) :: Command.t
   defcallback config() :: map
   defcallback run(nil | map | Command.t) :: {atom, Command.t}
@@ -78,7 +80,7 @@ defmodule Krill do
   #@status_error_generic 1
   
   defmacro __using__(_opts) do
-    quote do
+    quote location: :keep do
       require Logger
       use Application
       import Krill
@@ -197,13 +199,16 @@ defmodule Krill do
     end
   end
 
+
   @doc "Returns app name"
   @spec app() :: String.t
   def app, do: Atom.to_string(unquote(Mix.Project.config[:app]))
 
+
   @doc "Returns app version number"
   @spec version() :: String.t
   def version, do: unquote(Mix.Project.config[:version])
+
 
   @doc """
   Checks if `value` is a falsey value, an empty string or an empty list.  
@@ -243,6 +248,7 @@ defmodule Krill do
         end
       end )
   end
+
 
   @doc """
   Prints `merged_output` to :stdout and :stderr
@@ -321,56 +327,45 @@ defmodule Krill do
   
   Returns :ok
   """
-  @spec execute([String.t | {String.t | String.t}]) :: :ok | :error
 
-  def execute(command_names) when command_names == [] when command_names == [":config"] do
+  @spec execute([String.t | {String.t, map}], map) :: execute_result
+  def execute(command_names, conf \\ %{})
+
+  def execute(command_names, conf) when command_names == [] when command_names == [":config"] do
     Application.get_env(:krill, :config)
     |> Keyword.keys
+    |> Enum.map( &{&1, conf} )
     |> do_execute
   end
 
-  def execute([":all"]) do
+  def execute([":all"], conf) do
     Krill.list_commands()
+    |> Enum.map( &{&1, conf} )
     |> do_execute
   end
-  
-  def execute(command_names) when is_list(command_names) do
+
+  def execute(command_names, conf_general) when is_list(command_names) and is_map(conf_general) do
     Enum.map( command_names, fn
-      {command_name, command_line} ->
-        {String.to_atom(command_name), command_line}
+      {module_name, conf} ->
+        {String.to_atom(module_name), Map.merge(conf_general, conf)}
 
       command ->
-        String.to_atom(command)
+        {String.to_atom(command), conf_general}
     end)
     |> do_execute
   end
 
-  @spec do_execute([atom | {atom | String.t}]) :: :ok | :error
-  defp do_execute(commands) do
-    cond do
-      length(commands) > 0 -> 
-        Enum.map(commands, fn(command) ->
-          case command do
-            {command_name, command_line} ->
-              conf = Krill.local_config(command_name) |> Map.merge(%{command: command_line})
-              command_name = command_name
+  @spec do_execute([{atom, map}]) :: execute_result
+  # dispatches the tasks
+  defp do_execute(commands) when is_list(commands) and length(commands) > 0 do
+    Enum.map(commands, fn({module_name, conf}) ->
+      conf_basic = Krill.merge_config(module_name) |> Map.merge(conf)
+      conf = Krill.local_config(module_name) |> Map.merge(conf)
+      {Task.async(conf_basic.module, :run, [conf]), conf_basic.timeout}
+    end)
+    |> Enum.each(fn({task, timeout}) -> Task.await(task, timeout) end)
 
-            _ ->
-              command_name = command
-              conf = Krill.local_config(command_name)
-          end
-          conf_merged = Krill.merge_config(command_name)
-          {Task.async(conf_merged.module, :run, [conf]), conf_merged.timeout}
-        end)
-        |> Enum.each(fn({task, timeout}) ->
-          Task.await(task, timeout)
-        end)
-
-      true ->
-        exit({:shutdown, "No module_names provided"})
-    end
-
-    :ok
+    {:ok, commands}
   end
 
 end
