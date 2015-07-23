@@ -15,10 +15,10 @@ defmodule Krill.CLI do
   # help
   ./krill
 
-  # execute all tasks in config
+  # execute all commands in config
   ./krill :config
 
-  #execute all tasks under lib/command/*.ex
+  #execute all commands under lib/command/*.ex
   ./krill :all
 
   # execute one command

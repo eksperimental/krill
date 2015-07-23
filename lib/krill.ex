@@ -50,11 +50,11 @@ end
 
 defmodule Krill do
   @moduledoc """
-  `Krill` is a filter feeder that executes a shell command, and filters stdout and
-  stderr, according to rules set in the child module. Letting us get rid of
-  commands that will output exit with an error message and error status, and
-  being able to use this in Continuous Integration or other projects where
-  need our commands to return 0.
+  `Krill` is a filter feeder that executes a shell command, and filters `stdout` and
+  `stderr`, according to rules set in the child module. Letting us get rid of
+  commands that will output or exit with an error status or message. Krill enables
+  you to use these commands in Continuous Integration or other projects where
+  need our commands to return `0`.
   """
 
   require Logger
@@ -181,7 +181,7 @@ defmodule Krill do
 
       Returns `:ok`  
       """
-      @spec output(Command.t) :: :ok | :error
+      @spec output(Command.t) :: :ok
       def output(state) when is_map(state) do
         merge_output(state.stdout, state.stderr) |> print_output
 
@@ -215,9 +215,7 @@ defmodule Krill do
   """
   @spec empty?(term) :: boolean
   def empty?(value)
-    when value == ""
-    when value == []
-    when value == false
+    when value in [false, "", []]
     when is_nil(value),
     do: true
 
@@ -317,7 +315,7 @@ defmodule Krill do
   Executes the commands provided in list `commands`.
 
   If list is empty, then modules in the `config/config.exs` file are loaded.
-  One or more commands If `krill command_one command_two`.
+  One or more commands if invoked `krill command_one command_two`.
   
   If `krill :all` is called, then `.ex` files under `lib/command/`
   are used as commands (based on their file names).

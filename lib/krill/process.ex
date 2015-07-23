@@ -1,6 +1,6 @@
 defmodule Krill.Process do
   @moduledoc """
-  Deals with anything related to Porcelain.Process and Results
+  Deals with anything related to Porcelain.Process and Results.
   """
 
   alias Porcelain.Result

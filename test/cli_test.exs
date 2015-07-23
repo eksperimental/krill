@@ -13,9 +13,9 @@ defmodule Krill.CLITest do
   end
 
   test "help" do
-    assert capture_io(:stdio, fn ->
+    assert capture_io( :stdio, fn ->
       CLI.help()
-    end) != ""
+    end ) != ""
 
     assert is_bitstring( capture_io(:stdio, fn ->
       CLI.help()
